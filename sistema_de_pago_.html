@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Sistema de Pago - Suscripción</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #121212;
+            color: white;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .payment-container {
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            width: 400px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.5);
+        }
+
+        .plan-selector {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .plan {
+            background-color: #333;
+            border-radius: 5px;
+            padding: 15px;
+            width: 30%;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .plan:hover, .plan.selected {
+            background-color: #e50914;
+            transform: scale(1.05);
+        }
+
+        .payment-details input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            background-color: #333;
+            border: none;
+            border-radius: 5px;
+            color: white;
+        }
+
+        .payment-button {
+            width: 100%;
+            padding: 12px;
+            background-color: #e50914;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .payment-button:hover {
+            background-color: #f6121d;
+        }
+
+        .plan h3 {
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .plan p {
+            margin: 5px 0 0;
+            font-size: 14px;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <div class="payment-container">
+        <h2>Elige tu plan</h2>
+        <div class="plan-selector">
+            <div class="plan" data-plan="basico" data-price="10.05">
+                <h3>SEMANA</h3>
+                <p>10.05 BS/sem</p>
+            </div>
+            <div class="plan" data-plan="estandar" data-price="945">
+                <h3>3 MESES</h3>
+                <p>945 BS/mes</p>
+            </div>
+            <div class="plan" data-plan="premium" data-price="1.890">
+                <h3>6 MESES</h3>
+                <p>1.890 BS/mes</p>
+            </div>
+        </div>
+
+        <div class="payment-details">
+            <input type="text" id="cardName" placeholder="Nombre en la tarjeta" required>
+            <input type="text" id="cardNumber" placeholder="Número de tarjeta" required>
+            <input type="text" id="cardExpiry" placeholder="Fecha de expiración (MM/AA)" required>
+            <input type="text" id="cardCVV" placeholder="CVV" required>
+            <input type="text" id="NUMERO DE PLACA" placeholder="NUMERO DE PLACA" required>
+        </div>
+
+        <button class="payment-button" id="payButton">Suscribirse</button>
+    </div>
+
+    <script>
+        // Selección de plan
+        const plans = document.querySelectorAll('.plan');
+        let selectedPlan = null;
+
+        plans.forEach(plan => {
+            plan.addEventListener('click', () => {
+                // Remover selección previa
+                plans.forEach(p => p.classList.remove('selected'));
+                
+                // Seleccionar plan actual
+                plan.classList.add('selected');
+                selectedPlan = {
+                    name: plan.dataset.plan,
+                    price: plan.dataset.price
+                };
+            });
+        });
+
+        // Validación de pago
+        const payButton = document.getElementById('payButton');
+        payButton.addEventListener('click', () => {
+            // Obtener valores de input
+            const cardName = document.getElementById('cardName').value;
+            const cardNumber = document.getElementById('cardNumber').value;
+            const cardExpiry = document.getElementById('cardExpiry').value;
+            const cardCVV = document.getElementById('cardCVV').value;
+
+            // Validaciones básicas
+            if (!selectedPlan) {
+                alert('Por favor, selecciona un plan');
+                return;
+            }
+
+            if (!cardName || !cardNumber || !cardExpiry || !cardCVV) {
+                alert('Por favor, completa todos los campos');
+                return;
+            }
+
+            // Validación de número de tarjeta (simplificada)
+            if (cardNumber.length < 13 || cardNumber.length > 19) {
+                alert('Número de tarjeta inválido');
+                return;
+            }
+
+            // Validación de fecha de expiración
+            const expiryRegex = /^(0[1-9]|1[0-2])\/\d{2}$/;
+            if (!expiryRegex.test(cardExpiry)) {
+                alert('Fecha de expiración inválida. Use formato MM/AA');
+                return;
+            }
+
+            // Simulación de procesamiento de pago
+            alert(`¡Suscripción completada!\nPlan: ${selectedPlan.name}\nPrecio: BS ${selectedPlan.price}/mes`);
+        });
+    </script>
+</body>
+</html>

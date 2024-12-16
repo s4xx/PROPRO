@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title rtext>BUSCAR PLACA</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding-top: 50px;
+        }
+
+        input[type=text] {
+            padding: 10px;
+            margin: 10px;
+            width: 250px;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        #resultados {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h2 rtext>BUSCAR PLACA</h2>
+    <input type="text" id="busquedaNombreMascota" placeholder="Buscar por NUMERO DE PLACA">
+    <input type="text" id="busquedaNombreDueno" placeholder="Buscar por C.I.">
+    <button onclick="buscarMascotas()">Buscar</button>
+
+    <div id="resultados"></div>
+
+    <script>
+        // Datos de ejemplo (se pueden reemplazar con datos reales de una base de datos)
+        var mascotas = [
+            { nombre: "Luna", dueno: "Juan" },
+            { nombre: "Max", dueno: "María" },
+            { nombre: "Bella", dueno: "Pedro" },
+            { nombre: "Rocky", dueno: "Ana" },
+            { nombre: "Lola", dueno: "Juan" }
+        ];
+
+        function buscarMascotas() {
+            var busquedaNombreMascota = document.getElementById("busqueda por numero de placa").value.toLowerCase();
+            var busquedaNombreDueno = document.getElementById("busqueda por C.I.").value.toLowerCase();
+            var resultados = document.getElementById("resultados");
+            resultados.innerHTML = "";
+
+            var mascotasEncontradas = mascotas.filter(function(mascota) {
+                return (mascota.nombre.toLowerCase().includes(busquedaNombreMascota) && mascota.dueno.toLowerCase().includes(busquedaNombreDueno));
+            });
+
+            if (mascotasEncontradas.length === 0) {
+                resultados.innerHTML = "<p>No se encontraron mascotas.</p>";
+            } else {
+                var listaMascotas = "<ul>";
+                mascotasEncontradas.forEach(function(mascota) {
+                    listaMascotas += "<li>" + mascota.nombre + " - Dueño: " + mascota.dueno + "</li>";
+                });
+                listaMascotas += "</ul>";
+                resultados.innerHTML = listaMascotas;
+            }
+        }
+    </script>
+</body>
+</html>

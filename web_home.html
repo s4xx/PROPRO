@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenido</title>
+    <link id="fondo" rel="stylesheet" type="text/css" href="home.css">
+    
+    <style>
+        /* Estilos para el contenedor principal */
+        .container {
+            width: 300px; /* Ancho del contenedor */
+            margin: 0 auto; /* Centra el contenedor horizontalmente */
+            margin-top: 100px; /* Margen superior para centrar verticalmente */
+            padding: 20px; /* Espaciado interno */
+            background-color: #7033b6; /* Color de fondo */
+            border-radius: 10px; /* Borde redondeado */
+            box-shadow: 0 0 10px hwb(52 15% 23% / 0.1); /* Sombra */
+            filter: drop-shadow(0px 0px 10px hwb(59 1% 3%));
+            text-align: center; /* Alineación de texto centrada */
+        }
+
+        /* Estilos para los botones */
+        .btn {
+            display: inline-block; /* Convertir a bloque en línea */
+            margin: 10px; /* Margen entre botones */
+            padding: 10px 20px; /* Espaciado interno */
+            border: none; /* Sin borde */
+            border-radius: 5px; /* Borde redondeado */
+            background-color: #007bff; /* Color de fondo */
+            color: #fff; /* Color del texto */
+            text-decoration: none; /* Sin subrayado */
+            cursor: pointer; /* Cursor */
+            transition: background-color 0.3s; /* Transición de color de fondo */
+        }
+
+        /* Estilos para los botones al pasar el mouse */
+        .btn:hover {
+            background-color: #0056b3; /* Color de fondo al pasar el mouse */
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    
+    <h1>SISTEMA DE PEAJE DIGITAL</h1>
+    <a href="venta_productos.html" class="btn">RECARGA DE SALDO</a>
+    <a href="coonsulta.html" class="btn">Consulta</a>
+    <button onclick="window.location.href='new_mascota.html'"class="btn">Registro de Nuevo</button>
+    
+</div>
+
+</body>
+</html>
