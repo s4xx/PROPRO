@@ -1,0 +1,1338 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Sistema de Seguimiento de Medicación</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Variables de color temáticas */
+            --color-futurista-bg: #161c24; /* Fondo oscuro */
+            --color-futurista-accent: #00ffff; /* Cian/Neón */
+            --color-futurista-light: #f0f8ff; /* Blanco frío */
+            --color-futurista-primary: #00cccc; /* Cian primario para botones */
+            --color-futurista-secondary: #334455; /* Gris oscuro para fondos de elementos */
+            --color-futurista-success: #00c74b; /* Verde neón para éxito */
+            --color-futurista-warning: #ffaa00; /* Naranja/Amarillo para warnings */
+            --color-futurista-danger: #ff4141; /* Rojo brillante para peligro */
+
+            /* Color Primario Base (Bootstrap override) */
+            --color-primario: #207cca;
+        }
+
+        body {
+            background-color: var(--color-futurista-light);
+            min-height: 100vh;
+            color: #343a40; 
+        }
+        
+        /* Estilo FUTURISTA para Hero (Página de inicio) - MANTENIDO */
+        .hero {
+            background: var(--color-futurista-bg);
+            color: white;
+            padding: 5rem 1rem;
+            margin-bottom: 3rem; 
+            border-radius: 0 0 20px 20px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5), 
+                        inset 0 0 100px rgba(0, 255, 255, 0.1); 
+        }
+        
+        #hero-video {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            z-index: 0;
+            transform: translate(-50%, -50%);
+            filter: blur(1px) grayscale(40%) brightness(0.9); 
+            opacity: 0.9;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            background: rgba(10, 30, 60, 0.85); 
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .hero-content h1 {
+            text-shadow: 0 0 10px var(--color-futurista-accent);
+            font-weight: 800 !important;
+            letter-spacing: 1px;
+        }
+        
+        .hero-content #btnIniciar {
+            background-color: var(--color-futurista-accent);
+            border-color: var(--color-futurista-accent);
+            color: var(--color-futurista-bg);
+            box-shadow: 0 0 15px var(--color-futurista-accent);
+        }
+        .hero-content #btnIniciar:hover {
+            background-color: transparent;
+            color: var(--color-futurista-accent);
+            box-shadow: 0 0 25px var(--color-futurista-accent);
+        }
+        
+        .feature-card {
+            background-color: var(--color-futurista-bg); 
+            color: var(--color-futurista-light); 
+            border: 1px solid #00ffff55; 
+            box-shadow: 0 0 15px #00ffff33; 
+            transition: transform 0.3s, box-shadow 0.3s;
+            border-radius: 10px;
+        }
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 0 30px var(--color-futurista-accent), 0 15px 25px rgba(0,0,0,0.4);
+            cursor: pointer;
+        }
+        .feature-card .card-title {
+            color: var(--color-futurista-accent); 
+            font-weight: 600;
+        }
+        .feature-card .card-title::before {
+            content: attr(data-icon);
+            display: inline-block;
+            margin-right: 0.5rem;
+            color: var(--color-futurista-accent); 
+            font-size: 1.2rem;
+            animation: pulse 2s infinite; 
+        }
+        
+        @keyframes pulse {
+            0% { text-shadow: none; }
+            50% { text-shadow: 0 0 5px var(--color-futurista-accent); }
+            100% { text-shadow: none; }
+        }
+
+        .footer {
+            margin-top: 5rem;
+            padding: 2rem 0;
+            background-color: var(--color-futurista-bg);
+            color: var(--color-futurista-light);
+            text-align: center;
+            border-top: 3px solid var(--color-futurista-accent);
+            box-shadow: 0 -5px 15px rgba(0, 255, 255, 0.15);
+        }
+        
+        /* ESTILOS FUTURISTAS EN LOS PANELES (NUEVO/CORREGIDO) */
+        
+        /* 1. Contenedor principal del panel */
+        .panel-container {
+            background-color: var(--color-futurista-light); /* Fondo claro para contraste general */
+        }
+        
+        /* 2. Alerta de bienvenida */
+        .alert-info {
+            background-color: #e0ffff;
+            border-color: var(--color-futurista-accent);
+            color: var(--color-futurista-bg);
+            font-weight: 600;
+            border-left: 5px solid var(--color-futurista-accent);
+        }
+        
+        /* 3. Estilo de las tarjetas de información (Ficha, Alergias, Medicación) */
+        #pacienteCard, #pacientePanel .card {
+            background-color: var(--color-futurista-bg);
+            color: var(--color-futurista-light);
+            border: 1px solid var(--color-futurista-accent);
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+            transition: all 0.3s;
+        }
+        /* Encabezados de las Tarjetas (Panel Paciente) */
+        #pacientePanel .card-header.bg-primary { 
+            background-color: var(--color-futurista-secondary) !important;
+            border-bottom: 2px solid var(--color-futurista-accent);
+        }
+        #pacientePanel .card-header.bg-warning { 
+            background-color: var(--color-futurista-secondary) !important;
+            color: var(--color-futurista-warning) !important;
+            border-bottom: 2px solid var(--color-futurista-warning);
+        }
+        #pacientePanel .card-header.bg-success {
+            background-color: var(--color-futurista-secondary) !important;
+            border-bottom: 2px solid var(--color-futurista-success);
+        }
+        #pacientePanel .card-header h5 {
+            color: var(--color-futurista-accent) !important;
+            text-shadow: 0 0 3px rgba(0, 255, 255, 0.5);
+        }
+        /* Separador de Ficha de Paciente */
+        #pacienteCard hr {
+            border-top: 1px dashed var(--color-futurista-accent);
+            opacity: 0.5;
+        }
+        
+        /* 4. Estilo de Pestañas (Nav-Tabs) del Médico */
+        .nav-tabs {
+            border-bottom: 1px solid var(--color-futurista-secondary);
+        }
+        .nav-tabs .nav-link {
+            color: var(--color-futurista-secondary);
+            border: none;
+            border-bottom: 3px solid transparent;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .nav-tabs .nav-link.active {
+            color: var(--color-futurista-accent);
+            background-color: transparent;
+            border-color: var(--color-futurista-accent);
+            border-bottom: 3px solid var(--color-futurista-accent);
+        }
+        .nav-tabs .nav-link:hover:not(.active) {
+            color: var(--color-futurista-accent);
+            background-color: var(--color-futurista-secondary);
+            border-radius: 5px 5px 0 0;
+        }
+        
+        /* 5. Estilo de la Tabla de Pacientes */
+        .table {
+            --bs-table-bg: var(--color-futurista-light); 
+        }
+        .table-light {
+            --bs-table-bg: var(--color-futurista-secondary); 
+            color: var(--color-futurista-light);
+        }
+        .table-striped > tbody > tr:nth-of-type(odd) > * {
+            background-color: var(--color-futurista-secondary);
+            color: var(--color-futurista-light);
+        }
+        .table-striped > tbody > tr:nth-of-type(even) > * {
+            background-color: #33445580; /* Más claro */
+            color: var(--color-futurista-light);
+        }
+        /* Hover en filas */
+        .table-hover > tbody > tr:hover > * {
+            background-color: #334455aa !important; /* Más transparente */
+            cursor: pointer;
+        }
+        
+        /* 6. Estilo de Botones de Acción (Overriding Bootstrap) */
+        .btn-primary { /* Botón Buscar Paciente */
+            background-color: var(--color-futurista-primary);
+            border-color: var(--color-futurista-primary);
+            box-shadow: 0 0 5px var(--color-futurista-primary);
+        }
+        .btn-primary:hover {
+            background-color: var(--color-futurista-accent);
+            border-color: var(--color-futurista-accent);
+        }
+        .btn-success { /* Botón Agregar Receta */
+            background-color: var(--color-futurista-success);
+            border-color: var(--color-futurista-success);
+            box-shadow: 0 0 5px var(--color-futurista-success);
+        }
+        .btn-success:hover {
+            background-color: #00e054;
+            border-color: #00e054;
+        }
+        .btn-warning { /* Botón Traspasar/Asignar */
+            background-color: var(--color-futurista-warning);
+            border-color: var(--color-futurista-warning);
+        }
+        .btn-warning:hover {
+            background-color: #ffc233;
+            border-color: #ffc233;
+        }
+        .btn-danger { /* Botón Eliminar de lista */
+            background-color: var(--color-futurista-danger);
+            border-color: var(--color-futurista-danger);
+        }
+        .btn-danger:hover {
+            background-color: #ff6a6a;
+            border-color: #ff6a6a;
+        }
+        .btn-info { /* Botón Ver (en tabla) */
+            background-color: var(--color-futurista-accent);
+            border-color: var(--color-futurista-accent);
+            color: var(--color-futurista-bg);
+        }
+        .btn-info:hover {
+            background-color: #33ffff;
+            border-color: #33ffff;
+        }
+        .btn-outline-dark { /* Botón Ver Historial Completo */
+            color: var(--color-futurista-accent);
+            border-color: var(--color-futurista-accent);
+        }
+        .btn-outline-dark:hover {
+            background-color: var(--color-futurista-accent);
+            color: var(--color-futurista-bg);
+        }
+
+        /* Estilos de Paneles y Modales - MANTENIDOS/UNIFICADOS */
+        .modal.custom { display: none; position: fixed; inset: 0; z-index: 1050; background: rgba(0,0,0,0.8); }
+        .modal.custom .modal-dialog { margin: 6rem auto; }
+        .modal.custom .modal-content { background-color: var(--color-futurista-bg); color: var(--color-futurista-light); border: 1px solid #00ffff33; }
+        .modal.custom .modal-header { border-bottom: 1px solid #00ffff33; }
+        .modal.custom .modal-title { color: var(--color-futurista-accent); }
+        .modal.custom .btn-close { filter: invert(1); }
+        .registro-field { display: none; }
+        .panel-container { 
+            display:none; 
+            padding:2rem; 
+        }
+        #medicoPanel { display: none; }
+        #pacientePanel { display: none; }
+        
+        /* Medicamentos Activos en el Panel del Paciente */
+        #recetasActivasList .list-group-item {
+            background-color: var(--color-futurista-bg);
+            color: var(--color-futurista-light);
+            border-color: #334455;
+        }
+        
+    </style>
+</head>
+<body>
+
+    <div class="hero text-center" id="presentacionInicio">
+        
+        <video autoplay loop muted playsinline id="hero-video">
+            <source src="presentacion.mp4" type="video/mp4"> 
+            Tu navegador no soporta el tag de video.
+        </video>
+        <div class="hero-content">
+            <h1 class="display-5 fw-bold">Sistema Web de Control y Seguimiento de Medicación</h1>
+            <p class="lead fw-light fs-4">Triada Médico – Farmacia – Paciente | Reducción de la Automedicación</p>
+            <div class="d-flex justify-content-center gap-3 mt-5">
+                <button class="btn btn-lg shadow-lg" id="btnIniciar" onclick="openLogin()">Iniciar Sesión</button>
+                <button class="btn btn-outline-light btn-lg shadow-lg" id="btnRegistro" onclick="openRegistro()">Nuevo Registro</button>
+                <button class="btn btn-outline-light btn-lg shadow-lg" onclick="mostrarInfo()">Ver Información</button>
+            </div>
+            <small class="d-block mt-3 text-white-50">Proyecto de Grado • Seguridad y seguimiento farmacoterapéutico</small>
+        </div>
+        </div>
+
+    <div class="container" id="mainContenido">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card feature-card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title" data-icon="🔒">Seguridad</h5> 
+                        <p class="card-text">Recetas digitales encriptadas, acceso restringido y protección de datos del paciente.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card feature-card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title" data-icon="📈">Seguimiento</h5>
+                        <p class="card-text">Recordatorios de medicación, historial compartido y alertas de interacciones.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card feature-card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title" data-icon="🔗">Colaboración</h5>
+                        <p class="card-text">Conexión directa entre médicos, farmacias y pacientes para una atención integral.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-5 text-center">
+            <h3>¿Cómo funciona?</h3>
+            <p class="text-muted">Médicos generan recetas digitales → Farmacias validan → Pacientes acceden y siguen tratamiento.</p>
+        </div>
+    </div>
+
+    <div id="loginModal" class="modal custom" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Iniciar Sesión</h5>
+                    <button type="button" class="btn-close" aria-label="Cerrar" onclick="closeLogin()"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="loginForm" class="px-1">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Correo Electrónico</label>
+                            <input type="email" class="form-control" id="email" required placeholder="ejemplo@correo.com">
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Contraseña</label>
+                            <input type="password" class="form-control" id="password" required placeholder="••••••••">
+                        </div>
+                        <div class="mb-3">
+                            <label for="rol" class="form-label">Rol</label>
+                            <select class="form-select" id="rol" required>
+                                <option value="">-- Seleccione --</option>
+                                <option value="medico">Médico (Ej: dr.lopez@salud.bo)</option>
+                                <option value="paciente">Paciente (Ej: ana.garcia123@correo.com)</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Entrar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="registroModal" class="modal custom" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Nuevo Registro</h5>
+                    <button type="button" class="btn-close" aria-label="Cerrar" onclick="closeRegistro()"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="registroForm" class="px-1" onsubmit="registrarUsuario(event)">
+                        <div class="mb-3">
+                            <label for="reg_rol" class="form-label">Registrarse como</label>
+                            <select class="form-select" id="reg_rol" required onchange="toggleRegistroFields()">
+                                <option value="">-- Seleccione --</option>
+                                <option value="medico">Médico</option>
+                                <option value="paciente">Paciente</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="reg_nombre" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="reg_nombre" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="reg_apellidos" class="form-label">Apellidos</label>
+                            <input type="text" class="form-control" id="reg_apellidos" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="reg_ci" class="form-label">CI</label>
+                            <input type="text" class="form-control" id="reg_ci" required>
+                        </div>
+                        <div class="mb-3 registro-field medico-only">
+                            <label for="reg_matricula" class="form-label">Matrícula profesional</label>
+                            <input type="text" class="form-control" id="reg_matricula">
+                        </div>
+                        <div class="mb-3 registro-field medico-only">
+                            <label for="reg_especialidad" class="form-label">Especialidad</label>
+                            <input type="text" class="form-control" id="reg_especialidad">
+                        </div>
+                        <div class="mb-3 registro-field medico-only">
+                            <label for="reg_tel_laboral" class="form-label">Teléfono laboral</label>
+                            <input type="tel" class="form-control" id="reg_tel_laboral">
+                        </div>
+                        <div class="mb-3 registro-field medico-only">
+                            <label for="reg_clinica" class="form-label">Clínica/Hospital (opcional)</label>
+                            <input type="text" class="form-control" id="reg_clinica">
+                        </div>
+                        <div class="mb-3 registro-field paciente-only">
+                            <label for="reg_fecha_nac" class="form-label">Fecha de nacimiento</label>
+                            <input type="date" class="form-control" id="reg_fecha_nac">
+                        </div>
+                        <div class="mb-3 registro-field paciente-only">
+                            <label for="reg_tel_personal" class="form-label">Teléfono</label>
+                            <input type="tel" class="form-control" id="reg_tel_personal">
+                        </div>
+                        <div class="mb-3 registro-field paciente-only">
+                            <label for="reg_alergias" class="form-label">Alergias (opcional)</label>
+                            <textarea class="form-control" id="reg_alergias"></textarea>
+                        </div>
+                        <div class="mb-3 registro-field paciente-only">
+                            <label for="reg_enfermedades" class="form-label">Enfermedades (opcional)</label>
+                            <textarea class="form-control" id="reg_enfermedades"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="reg_email" class="form-label">Correo Electrónico</label>
+                            <input type="email" class="form-control" id="reg_email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="reg_password" class="form-label">Contraseña</label>
+                            <input type="password" class="form-control" id="reg_password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Registrar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-container" id="panel">
+        <div class="container">
+            <div class="alert alert-info" id="welcomeMsg"></div>
+
+            <div id="medicoPanel">
+                <div class="row mt-4">
+                    
+                    <div class="col-lg-7">
+                        <ul class="nav nav-tabs" id="pacientesTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="asignados-tab" data-bs-toggle="tab" data-bs-target="#asignados" type="button" role="tab" aria-controls="asignados" aria-selected="true">
+                                    👩‍⚕️ Mis Pacientes
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="no-asignados-tab" data-bs-toggle="tab" data-bs-target="#no-asignados" type="button" role="tab" aria-controls="no-asignados" aria-selected="false">
+                                    🌐 Pacientes No Asignados
+                                </button>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content" id="pacientesTabsContent">
+                            
+                            <div class="tab-pane fade show active" id="asignados" role="tabpanel" aria-labelledby="asignados-tab">
+                                <div class="d-flex gap-2 mb-3 mt-3">
+                                    <input id="buscarPaciente" class="form-control" type="search" placeholder="Buscar paciente por inicial, nombre, teléfono, email...">
+                                    <select id="filtroEdad" class="form-select" style="max-width:160px;">
+                                        <option value="">Todos</option>
+                                        <option value="0-18">0-18</option>
+                                        <option value="19-40">19-40</option>
+                                        <option value="41-65">41-65</option>
+                                        <option value="66+">66+</option>
+                                    </select>
+                                    <button id="btnBuscarPaciente" class="btn btn-primary" onclick="aplicarFiltros()">Buscar paciente</button>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-hover">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th style="width:48px;">#</th>
+                                                <th>Nombre</th>
+                                                <th>Edad</th>
+                                                <th>Email</th>
+                                                <th>Última visita</th>
+                                                <th style="width:110px;">Acción</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="pacientesTableBody">
+                                            </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane fade" id="no-asignados" role="tabpanel" aria-labelledby="no-asignados-tab">
+                                <div class="mt-3">
+                                    <input id="buscarNoAsignado" class="form-control mb-3" type="search" placeholder="Buscar paciente no asignado...">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped table-hover">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th style="width:48px;">#</th>
+                                                    <th>Nombre</th>
+                                                    <th>Edad</th>
+                                                    <th>Email</th>
+                                                    <th>Acción</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="noAsignadosTableBody">
+                                                </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-5">
+                        <h4 style="color:var(--color-futurista-bg);">Ficha del paciente</h4>
+                        <div id="pacienteCard" class="card" style="min-height:240px;">
+                            <div class="card-body" id="pacienteCardBody">
+                                <p class="text-muted" style="color:#f0f8ff99 !important;">Seleccione un paciente para ver detalles.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <div id="agregarRecetaBox" class="mb-3" style="display:none;">
+                                <form id="formAgregarReceta" class="d-flex gap-2 align-items-end">
+                                    <input id="nuevaReceta" class="form-control" type="text" placeholder="Nueva receta (ej: Paracetamol 500mg)">
+                                    <button type="submit" class="btn btn-success">Agregar receta</button>
+                                </form>
+                                <div id="msgRecetaAgregada" class="text-success small mt-1" style="display:none; color:var(--color-futurista-success) !important; text-shadow:0 0 3px rgba(0, 199, 75, 0.5);">Receta agregada correctamente.</div>
+                            </div>
+                            
+                            <div id="gestionPacientesBtns" class="d-grid gap-2 mt-3">
+                                <button id="btnTraspasar" class="btn btn-warning" style="display:none;" onclick="showTraspasoModal()">
+                                    Agregar o Traspasar Paciente
+                                </button>
+                                <button id="btnEliminar" class="btn btn-danger" style="display:none;" onclick="eliminarPacienteDeLista()">
+                                    Eliminar de mi lista
+                                </button>
+                            </div>
+                            
+                            <button id="btnVerHistorial" class="btn btn-outline-dark mt-3" style="display:none;">Ver Historial Completo</button>
+                        </div>
+                    </div>
+                </div>
+            </div> 
+            
+            <div id="pacientePanel" class="row mt-4">
+                <div class="col-lg-5">
+                    <div class="card mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Mi Ficha de Salud</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="mb-1"><strong>Nombre:</strong> <span id="pacienteNombre"></span></p>
+                            <p class="mb-1"><strong>CI:</strong> <span id="pacienteCI"></span></p>
+                            <p class="mb-1"><strong>Teléfono:</strong> <span id="pacienteTelefono"></span></p>
+                            <p class="mb-1"><strong>Email:</strong> <span id="pacienteEmail"></span></p>
+                            <hr>
+                            <p class="mb-1"><strong>Médico Asignado:</strong> <span id="pacienteMedicoAsignado" class="text-success"></span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-7">
+                    <div class="card mb-4">
+                        <div class="card-header bg-warning text-dark">
+                            <h5 class="mb-0">⚠️ Alergias y Condiciones</h5>
+                        </div>
+                        <div class="card-body">
+                            <h6>Alergias:</h6>
+                            <p class="text-danger" id="pacienteAlergias">No registradas.</p>
+                            <h6>Enfermedades/Condiciones:</h6>
+                            <p id="pacienteEnfermedades">No registradas.</p>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">💊 Medicación Activa</h5>
+                        </div>
+                        <ul class="list-group list-group-flush" id="recetasActivasList">
+                            <li class="list-group-item text-muted">No tiene recetas activas en este momento.</li>
+                        </ul>
+                        <div class="card-footer text-end">
+                            <button class="btn btn-sm btn-outline-dark" onclick="mostrarHistorialPaciente()">Ver Historial Completo</button>
+                        </div>
+                    </div>
+                </div>
+            </div> 
+            
+            <div class="row mt-4">
+                <div class="col-12">
+                    <button class="btn btn-outline-secondary" onclick="logout()">Cerrar Sesión</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="traspasoModal" class="modal custom" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="traspasoTitle"></h5>
+                    <button type="button" class="btn-close" aria-label="Cerrar" onclick="closeTraspasoModal()"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="traspasoMsg"></p>
+                    <label for="doctorDestino" class="form-label">Seleccionar Doctor de destino:</label>
+                    <select class="form-select" id="doctorDestino" required></select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeTraspasoModal()">Cancelar</button>
+                    <button type="button" class="btn btn-warning" onclick="traspasarPaciente()">Confirmar Traspaso/Asignación</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="footer" id="piePagina">
+        <p>Proyecto de Grado – Ingeniería en Sistemas | Universidad Tecnología Boliviana</p>
+        <p>Postulante: Nayla Maydelin Jove Parisaca | 2025</p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // =========================================================
+        // Generador de Datos Ficticios para la Simulación
+        // =========================================================
+
+        const nombres = ["Ana", "Carlos", "Luisa", "Javier", "Elena", "Miguel", "Sofía", "Pablo", "Laura", "Daniel", "Eva", "Ricardo", "Carmen", "Andrés", "Julia", "Manuel", "Isabel", "Raúl", "Rosa", "Felipe", "Marta", "Jorge", "Nerea", "Victor", "Diana", "Alejandro", "Clara", "Marcos", "Nuria", "Fernando"];
+        const apellidos = ["García", "Rodríguez", "López", "Martínez", "Pérez", "Gómez", "Sánchez", "Fernández", "Díaz", "Ruiz", "Torres", "Vargas", "Salas", "Ríos", "Castro", "Molina", "Herrera", "Ortega", "Peña", "Flores", "Navarro", "Guerra", "Méndez", "Reyes", "Jiménez", "Aguilar", "Moreno", "Romero", "Cruz", "Silva"];
+        const condiciones = ["Hipertensión", "Diabetes Tipo 2", "Asma", "Artritis", "Migrañas", "Ansiedad", "Alergias Estacionales", "Hipotiroidismo", "Sin antecedentes"];
+        const medicamentos = ["Paracetamol 500mg", "Ibuprofeno 400mg", "Metformina 850mg", "Enalapril 10mg", "Amoxicilina 500mg", "Omeprazol 20mg", "Salbutamol Inhalador", "Loratadina 10mg"];
+        const indicaciones = ["Tomar una vez al día.", "Tomar dos veces al día con alimentos.", "Solo si es necesario (dolor/fiebre).", "Tomar por 7 días.", "Tomar antes de dormir."];
+
+        let CI_COUNTER = 1000000;
+        let PHONE_COUNTER = 70000000;
+        
+        function generarRecetaFicticia(receta, indicaciones) {
+            return {
+                receta: `${receta} - ${Math.floor(Math.random() * 20) + 7} días`,
+                indicaciones: indicaciones[Math.floor(Math.random() * indicaciones.length)],
+                activo: Math.random() < 0.7, // 70% de probabilidad de estar activo
+            };
+        }
+
+        function generarPaciente(doctorId, index) {
+            const nombre = nombres[index % nombres.length];
+            const apellido = apellidos[index % apellidos.length];
+            const edad = Math.floor(Math.random() * 60) + 18;
+            const condicion = condiciones[Math.floor(Math.random() * condiciones.length)];
+            const ci = (CI_COUNTER++).toString();
+            const tel = (PHONE_COUNTER++).toString();
+            const email = `${nombre.toLowerCase()}.${apellido.toLowerCase()}${ci.slice(-3)}@correo.com`;
+            
+            // Generar 1 o 2 recetas (solo si está asignado)
+            let recetas = [];
+            if (doctorId) {
+                const numRecetas = Math.floor(Math.random() * 3); // 0, 1 o 2
+                for (let i = 0; i < numRecetas; i++) {
+                    recetas.push(generarRecetaFicticia(medicamentos[Math.floor(Math.random() * medicamentos.length)], indicaciones));
+                }
+            }
+
+            return {
+                nombre: nombre,
+                apellidos: apellido,
+                email: email,
+                pass: "123456", 
+                ci: ci,
+                tel_personal: tel,
+                alergias: Math.random() < 0.2 ? 'Penicilina' : 'Ninguna',
+                enfermedades: condicion,
+                doctorId: doctorId,
+                recetas: recetas.filter(r => r.activo).map(r => ({receta: r.receta, indicaciones: r.indicaciones, activo: true})), // Solo activas para la lista simple
+                edad: edad,
+                fecha_nac: `19${String(99 - edad).padStart(2, '0')}-01-01`, 
+                telefono: tel, 
+                ultimaVisita: `2025-${String(Math.floor(Math.random() * 8) + 1).padStart(2, '0')}-${String(Math.floor(Math.random() * 28) + 1).padStart(2, '0')}`,
+                condicion: doctorId ? condicion : "Sin asignar",
+                // Historial incluye activas y no activas
+                historialRecetas: recetas.map(r => ({ 
+                    ...r, 
+                    fecha: `2025-${String(Math.floor(Math.random() * 8) + 1).padStart(2, '0')}-01`, 
+                    hora: '10:00' 
+                }))
+            };
+        }
+
+        // =========================================================
+        // INICIALIZACIÓN DE BASES DE DATOS SIMULADAS
+        // =========================================================
+
+        let pacientesNoAsignados = [];
+        let todosLosPacientesDB = [];
+
+        // Inicialización para el Dr. López (Simulación del usuario logueado)
+        const pacientesLopez = [];
+        for (let i = 0; i < 30; i++) {
+            const p = generarPaciente("lopez", i);
+            pacientesLopez.push(p);
+            todosLosPacientesDB.push(p);
+        }
+
+        // Inicialización para la Dra. Mendoza
+        const pacientesMendoza = [];
+        for (let i = 30; i < 60; i++) {
+            const p = generarPaciente("mendoza", i);
+            pacientesMendoza.push(p);
+            todosLosPacientesDB.push(p);
+        }
+
+        // Inicialización de pacientes NO ASIGNADOS
+        for (let i = 60; i < 80; i++) {
+            const p = generarPaciente(null, i);
+            pacientesNoAsignados.push(p);
+            todosLosPacientesDB.push(p);
+        }
+
+        // Base de datos principal
+        const usuarios = {
+            medico: [
+                {
+                    email: "dr.lopez@salud.bo",
+                    pass: "123456",
+                    nombre: "Dr. Carlos López",
+                    id: "lopez",
+                    pacientes: pacientesLopez 
+                },
+                {
+                    email: "dra.mendoza@salud.bo",
+                    pass: "123456",
+                    nombre: "Dra. Ana Mendoza",
+                    id: "mendoza",
+                    pacientes: pacientesMendoza
+                }
+            ],
+            paciente: todosLosPacientesDB
+        };
+
+        // Variables de estado
+        let medicoActual = null;
+        let pacienteLogueado = null; 
+        let pacienteSeleccionado = null;
+        let pacienteSeleccionadoOrigen = 'asignado'; 
+
+
+        // =========================================================
+        // FUNCIONES DE UI (MODALES)
+        // =========================================================
+        function openLogin(){
+            document.getElementById('loginModal').style.display = 'block';
+        }
+        function closeLogin(){
+            document.getElementById('loginModal').style.display = 'none';
+        }
+        function openRegistro(){
+            document.getElementById('registroModal').style.display = 'block';
+            document.getElementById('registroForm').reset();
+            toggleRegistroFields();
+        }
+        function closeRegistro(){
+            document.getElementById('registroModal').style.display = 'none';
+        }
+        function toggleRegistroFields() {
+            const rol = document.getElementById('reg_rol').value;
+            document.querySelectorAll('.registro-field').forEach(el => el.style.display = 'none');
+            if (rol === 'medico') {
+                document.querySelectorAll('.medico-only').forEach(el => el.style.display = 'block');
+            } else if (rol === 'paciente') {
+                document.querySelectorAll('.paciente-only').forEach(el => el.style.display = 'block');
+            }
+        }
+        function mostrarInfo(){
+            alert('Sistema para el control y seguimiento de medicación. Seguridad, trazabilidad y colaboración.');
+        }
+
+        // =========================================================
+        // FUNCIONES DE UTILIDAD
+        // =========================================================
+        function calcularEdad(fechaNacimiento) {
+            if (!fechaNacimiento) return '-';
+            const hoy = new Date();
+            const cumpleanos = new Date(fechaNacimiento);
+            let edad = hoy.getFullYear() - cumpleanos.getFullYear();
+            const mes = hoy.getMonth() - cumpleanos.getMonth();
+            if (mes < 0 || (mes === 0 && hoy.getDate() < cumpleanos.getDate())) {
+                edad--;
+            }
+            return edad;
+        }
+        function formatDate(d) {
+            if (d === 'N/A' || !d) return 'N/A';
+            const date = new Date(d);
+            return date.toLocaleDateString();
+        }
+
+        // =========================================================
+        // FUNCIÓN DE REGISTRO
+        // =========================================================
+        function registrarUsuario(e) {
+            e.preventDefault();
+            
+            const form = document.getElementById('registroForm');
+            const rol = document.getElementById('reg_rol').value;
+            
+            if (!rol) {
+                alert('Por favor, seleccione un rol.');
+                return;
+            }
+            
+            const nuevoUsuario = {
+                email: document.getElementById('reg_email').value.trim(),
+                pass: document.getElementById('reg_password').value.trim(),
+                nombre: document.getElementById('reg_nombre').value.trim(),
+                apellidos: document.getElementById('reg_apellidos').value.trim(),
+                ci: document.getElementById('reg_ci').value.trim(),
+            };
+
+            if (rol === 'medico') {
+                nuevoUsuario.matricula = document.getElementById('reg_matricula').value.trim();
+                nuevoUsuario.especialidad = document.getElementById('reg_especialidad').value.trim();
+                nuevoUsuario.tel_laboral = document.getElementById('reg_tel_laboral').value.trim();
+                nuevoUsuario.clinica = document.getElementById('reg_clinica').value.trim();
+                nuevoUsuario.id = nuevoUsuario.email.split('@')[0].replace('.', '');
+                nuevoUsuario.pacientes = [];
+                
+                usuarios.medico.push(nuevoUsuario);
+
+            } else if (rol === 'paciente') {
+                nuevoUsuario.fecha_nac = document.getElementById('reg_fecha_nac').value;
+                nuevoUsuario.tel_personal = document.getElementById('reg_tel_personal').value.trim();
+                nuevoUsuario.alergias = document.getElementById('reg_alergias').value.trim() || 'No registradas.';
+                nuevoUsuario.enfermedades = document.getElementById('reg_enfermedades').value.trim() || 'Ninguna registrada.';
+                nuevoUsuario.doctorId = null; 
+                nuevoUsuario.recetas = []; 
+                nuevoUsuario.edad = calcularEdad(nuevoUsuario.fecha_nac); 
+                nuevoUsuario.condicion = "Sin asignar"; 
+                nuevoUsuario.ultimaVisita = "N/A";
+                nuevoUsuario.telefono = nuevoUsuario.tel_personal; 
+                nuevoUsuario.historialRecetas = []; 
+
+                usuarios.paciente.push(nuevoUsuario);
+                pacientesNoAsignados.push(nuevoUsuario);
+            }
+
+            alert(`¡Registro exitoso! 🥳\nUsuario: ${nuevoUsuario.nombre} ${nuevoUsuario.apellidos}\nRol: ${rol === 'medico' ? 'Médico' : 'Paciente'}\n\nAhora puede iniciar sesión con el email y contraseña registrados.`);
+            
+            form.reset();
+            closeRegistro();
+            openLogin(); 
+        }
+
+
+        // =========================================================
+        // LÓGICA DE INICIO DE SESIÓN Y CARGA DE PANEL (CORREGIDA)
+        // =========================================================
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value.trim();
+            const pass = document.getElementById('password').value.trim();
+            const rol = document.getElementById('rol').value;
+            
+            let user = null;
+            if (rol === 'medico') {
+                user = usuarios.medico.find(u => u.email === email && u.pass === pass);
+            } else if (rol === 'paciente') {
+                user = usuarios.paciente.find(u => u.email === email && u.pass === pass);
+            }
+            
+            if (user && rol) {
+                document.getElementById('presentacionInicio').style.display = 'none';
+                document.getElementById('mainContenido').style.display = 'none';
+                document.getElementById('piePagina').style.display = 'none';
+                closeLogin();
+                document.getElementById('panel').style.display = 'block';
+
+                document.getElementById('welcomeMsg').innerText =
+                    `¡Bienvenido, ${user.nombre}! Sesión iniciada como ${rol === 'medico' ? 'Médico' : 'Paciente'}.`;
+
+                if (rol === 'medico') {
+                    medicoActual = user;
+                    pacienteLogueado = null;
+                    document.getElementById('medicoPanel').style.display = 'flex';
+                    document.getElementById('pacientePanel').style.display = 'none';
+                    
+                    // Asegurar que la pestaña "Mis Pacientes" esté activa al cargar
+                    const asignadosTab = document.getElementById('asignados-tab');
+                    if (!asignadosTab.classList.contains('active')) {
+                        const tabs = new bootstrap.Tab(asignadosTab);
+                        tabs.show();
+                    }
+                    aplicarFiltros();
+                    renderPacientesNoAsignados(pacientesNoAsignados);
+                    
+                    // Escucha del evento de cambio de pestaña para recargar el listado
+                    document.getElementById('pacientesTabs').addEventListener('shown.bs.tab', (e) => {
+                        clearPacienteDetalle();
+                        if (e.target.id === 'asignados-tab') {
+                            aplicarFiltros();
+                        } else {
+                            renderPacientesNoAsignados(pacientesNoAsignados);
+                        }
+                    }, { once: true }); // Usamos once: true y se reasigna en el logout/login
+
+                    document.getElementById('buscarNoAsignado').oninput = buscarNoAsignados;
+                    document.getElementById('buscarPaciente').oninput = aplicarFiltros;
+
+
+                } else if (rol === 'paciente') {
+                    pacienteLogueado = user;
+                    medicoActual = null;
+                    document.getElementById('medicoPanel').style.display = 'none';
+                    document.getElementById('pacientePanel').style.display = 'flex'; 
+                    
+                    cargarPanelPaciente(pacienteLogueado);
+                }
+
+            } else {
+                alert('Credenciales incorrectas. Intente de nuevo o regístrese.');
+            }
+        });
+
+        // =========================================================
+        // LÓGICA DEL PANEL DEL PACIENTE 
+        // =========================================================
+        function cargarPanelPaciente(paciente) {
+            document.getElementById('pacienteNombre').textContent = `${paciente.nombre} ${paciente.apellidos}`;
+            document.getElementById('pacienteCI').textContent = paciente.ci;
+            document.getElementById('pacienteTelefono').textContent = paciente.tel_personal || paciente.telefono || '-';
+            document.getElementById('pacienteEmail').textContent = paciente.email;
+            
+            // Aplicar estilo de color a las alergias
+            const alergiasEl = document.getElementById('pacienteAlergias');
+            alergiasEl.textContent = paciente.alergias || 'No registradas.';
+            alergiasEl.style.color = paciente.alergias && paciente.alergias !== 'Ninguna' ? 'var(--color-futurista-danger)' : 'var(--color-futurista-light)';
+            
+            document.getElementById('pacienteEnfermedades').textContent = paciente.enfermedades || 'Ninguna registrada.';
+
+            const medicoAsignado = usuarios.medico.find(m => m.id === paciente.doctorId);
+            const medicoAsignadoEl = document.getElementById('pacienteMedicoAsignado');
+            if (medicoAsignado) {
+                medicoAsignadoEl.textContent = medicoAsignado.nombre;
+                medicoAsignadoEl.style.color = 'var(--color-futurista-success)';
+            } else {
+                medicoAsignadoEl.textContent = 'Ninguno (Contácte a un centro de salud)';
+                medicoAsignadoEl.style.color = 'var(--color-futurista-danger)';
+            }
+
+            const recetasList = document.getElementById('recetasActivasList');
+            recetasList.innerHTML = '';
+            
+            // Usar historialRecetas para asegurar que todas las propiedades estén presentes
+            const recetasActivas = (paciente.historialRecetas || []).filter(r => r.activo);
+
+            if (recetasActivas.length > 0) {
+                recetasActivas.forEach((r) => {
+                    const li = document.createElement('li');
+                    li.className = 'list-group-item';
+                    li.innerHTML = `
+                        <strong>${r.receta}</strong>
+                        <p class="mb-0 small text-muted" style="color:#f0f8ff77 !important;">Indicaciones: ${r.indicaciones || 'No especificadas.'}</p>
+                        <button class="btn btn-sm btn-outline-info mt-1" style="border-color:var(--color-futurista-accent); color:var(--color-futurista-accent);" onclick="alert('Simulación: Se establece recordatorio para ${r.receta}')">⏰ Recordatorio</button>
+                    `;
+                    recetasList.appendChild(li);
+                });
+            } else {
+                recetasList.innerHTML = '<li class="list-group-item text-muted" style="color:#f0f8ff77 !important;">No tiene recetas activas en este momento.</li>';
+            }
+        }
+
+        function mostrarHistorialPaciente() {
+             // Reutilizar la función para el panel del médico, solo necesitamos el pacienteLogueado
+             if (!pacienteLogueado) return;
+             mostrarHistorialRecetas(pacienteLogueado);
+        }
+
+        // =========================================================
+        // LÓGICA DEL PANEL DEL MÉDICO
+        // =========================================================
+
+        function aplicarFiltros() {
+            if (!medicoActual) return;
+            
+            const busqueda = document.getElementById('buscarPaciente').value.toLowerCase();
+            const filtroEdad = document.getElementById('filtroEdad').value;
+            
+            const pacientesFiltrados = medicoActual.pacientes.filter(p => {
+                // Filtro por búsqueda de texto
+                const matchTexto = !busqueda || 
+                    p.nombre.toLowerCase().includes(busqueda) || 
+                    p.apellidos.toLowerCase().includes(busqueda) || 
+                    p.email.toLowerCase().includes(busqueda) ||
+                    p.telefono.includes(busqueda) ||
+                    p.tel_personal.includes(busqueda);
+                    
+                if (!matchTexto) return false;
+
+                // Filtro por edad
+                if (filtroEdad) {
+                    const edad = p.edad;
+                    if (filtroEdad === '0-18' && (edad < 0 || edad > 18)) return false;
+                    if (filtroEdad === '19-40' && (edad < 19 || edad > 40)) return false;
+                    if (filtroEdad === '41-65' && (edad < 41 || edad > 65)) return false;
+                    if (filtroEdad === '66+' && edad < 66) return false;
+                }
+                return true;
+            });
+            
+            renderPacientes(pacientesFiltrados, document.getElementById('pacientesTableBody'), 'asignado');
+        }
+
+        function buscarNoAsignados() {
+            const busqueda = document.getElementById('buscarNoAsignado').value.toLowerCase();
+            const filtrados = pacientesNoAsignados.filter(p => 
+                !busqueda || 
+                p.nombre.toLowerCase().includes(busqueda) || 
+                p.apellidos.toLowerCase().includes(busqueda) ||
+                p.email.toLowerCase().includes(busqueda)
+            );
+            renderPacientesNoAsignados(filtrados);
+        }
+
+        function renderPacientesNoAsignados(pacientes = []) {
+             renderPacientes(pacientes, document.getElementById('noAsignadosTableBody'), 'no-asignado');
+        }
+
+        function renderPacientes(pacientes = [], tbodyElement, origen) {
+            tbodyElement.innerHTML = '';
+            if (pacientes.length === 0) {
+                const colSpan = origen === 'asignado' ? 6 : 5;
+                tbodyElement.innerHTML = `<tr><td colspan="${colSpan}" class="text-center text-muted" style="color:#f0f8ff77 !important;">No hay pacientes que coincidan con la búsqueda/filtro.</td></tr>`;
+                return;
+            }
+
+            pacientes.forEach((p, index) => {
+                const tr = document.createElement('tr');
+                // Buscamos el objeto de la DB principal para asegurar que tengamos todos los datos
+                const pCompleto = usuarios.paciente.find(u => u.email === p.email) || p; 
+                
+                tr.innerHTML = `
+                    <td style="color:var(--color-futurista-accent);">${index + 1}</td>
+                    <td>${p.nombre} ${p.apellidos}</td>
+                    <td>${p.edad || '-'}</td>
+                    <td>${p.email}</td>
+                    ${origen === 'asignado' ? `<td>${formatDate(p.ultimaVisita)}</td>` : ''}
+                    <td>
+                        <button class="btn btn-sm btn-info" onclick="showPatientDetail(usuarios.paciente.find(u => u.email === '${p.email}') || p, '${origen}')">Ver</button>
+                    </td>
+                `;
+                tbodyElement.appendChild(tr);
+            });
+        }
+
+        function showPatientDetail(p, origen) {
+            pacienteSeleccionado = p;
+            pacienteSeleccionadoOrigen = origen;
+            const cardBody = document.getElementById('pacienteCardBody');
+            
+            // El color del texto es 'var(--color-futurista-light)' por el estilo del card.
+            // Sobrescribimos el color de los detalles clave.
+            cardBody.innerHTML = `
+                <h6 style="color:var(--color-futurista-accent);">${p.nombre} ${p.apellidos} (${p.edad || '-'} años)</h6>
+                <p class="mb-1">Email: <strong style="color:var(--color-futurista-accent);">${p.email}</strong></p>
+                <p class="mb-1">Teléfono: ${p.tel_personal || p.telefono || '-'}</p>
+                <p class="mb-1">Condición: <span class="badge bg-secondary" style="background-color:#556677 !important;">${p.condicion}</span></p>
+                <p class="mb-1" style="color:var(--color-futurista-danger);">Alergias: ${p.alergias || 'N/A'}</p>
+                <hr>
+                <h6 style="color:var(--color-futurista-accent);">Recetas Activas:</h6>
+                <ul class="list-unstyled small">
+                    ${(p.historialRecetas || []).filter(r => r.activo).map(r => `<li style="color:var(--color-futurista-light);">- ${r.receta}</li>`).join('') || '<li class="text-muted" style="color:#f0f8ff77 !important;">Ninguna activa.</li>'}
+                </ul>
+            `;
+            
+            // Mostrar u ocultar botones de acción
+            document.getElementById('agregarRecetaBox').style.display = origen === 'asignado' ? 'flex' : 'none';
+            document.getElementById('btnVerHistorial').style.display = 'block'; // Siempre se puede ver el historial si hay paciente
+
+            // Botones de gestión (Agregar/Traspasar/Eliminar)
+            document.getElementById('gestionPacientesBtns').style.display = 'grid';
+            document.getElementById('btnTraspasar').style.display = 'block';
+
+            if (origen === 'asignado') {
+                document.getElementById('btnTraspasar').textContent = 'Traspasar Paciente';
+                document.getElementById('btnEliminar').style.display = 'block';
+            } else {
+                document.getElementById('btnTraspasar').textContent = 'Asignar a mi lista';
+                document.getElementById('btnEliminar').style.display = 'none'; 
+            }
+            
+            // Asignar el paciente a la función de historial para el panel del médico
+            document.getElementById('btnVerHistorial').onclick = () => mostrarHistorialRecetas(pacienteSeleccionado);
+        }
+
+        function clearPacienteDetalle() {
+            document.getElementById('pacienteCardBody').innerHTML = '<p class="text-muted" style="color:#f0f8ff99 !important;">Seleccione un paciente para ver detalles.</p>';
+            document.getElementById('agregarRecetaBox').style.display = 'none';
+            document.getElementById('btnVerHistorial').style.display = 'none';
+            document.getElementById('gestionPacientesBtns').style.display = 'none';
+            pacienteSeleccionado = null;
+        }
+
+        function showTraspasoModal() {
+            if (!pacienteSeleccionado) return;
+            
+            const modal = document.getElementById('traspasoModal');
+            const title = document.getElementById('traspasoTitle');
+            const msg = document.getElementById('traspasoMsg');
+            const select = document.getElementById('doctorDestino');
+            
+            select.innerHTML = '';
+            
+            // Llenar select con todos los médicos, excepto el actual si es traspaso
+            usuarios.medico.forEach(m => {
+                const option = document.createElement('option');
+                option.value = m.id;
+                option.textContent = m.nombre;
+                select.appendChild(option);
+            });
+            
+            if (pacienteSeleccionadoOrigen === 'asignado') {
+                title.textContent = `Traspasar a ${pacienteSeleccionado.nombre}`;
+                msg.textContent = `Está a punto de traspasar a ${pacienteSeleccionado.nombre} ${pacienteSeleccionado.apellidos} a otro médico.`;
+                select.value = doctorIdDestino; // No hay valor por defecto
+            } else {
+                 title.textContent = `Asignar a ${pacienteSeleccionado.nombre}`;
+                 msg.textContent = `Está a punto de ASIGNAR a ${pacienteSeleccionado.nombre} ${pacienteSeleccionado.apellidos} a su lista. Seleccione su nombre para confirmar.`;
+                 
+                 // Seleccionar por defecto al doctor actual
+                 select.value = medicoActual.id;
+            }
+            
+            modal.style.display = 'block';
+        }
+
+        function closeTraspasoModal() {
+            document.getElementById('traspasoModal').style.display = 'none';
+        }
+
+        function traspasarPaciente() {
+            if (!pacienteSeleccionado) return;
+            const doctorIdDestino = document.getElementById('doctorDestino').value;
+            const doctorDestino = usuarios.medico.find(m => m.id === doctorIdDestino);
+            
+            if (!doctorDestino) {
+                alert('Debe seleccionar un doctor de destino válido.');
+                return;
+            }
+            
+            // 1. Eliminar de la lista de origen (ya sea asignados o no-asignados)
+            if (pacienteSeleccionadoOrigen === 'asignado') {
+                // Eliminar de la lista del doctor actual
+                medicoActual.pacientes = medicoActual.pacientes.filter(p => p.email !== pacienteSeleccionado.email);
+            } else {
+                // Eliminar de la lista de no asignados
+                pacientesNoAsignados = pacientesNoAsignados.filter(p => p.email !== pacienteSeleccionado.email);
+            }
+            
+            // 2. Asignar al nuevo doctor si no es el mismo
+            if (pacienteSeleccionadoOrigen === 'asignado' || doctorIdDestino === medicoActual.id) {
+                 pacienteSeleccionado.doctorId = doctorIdDestino;
+                 doctorDestino.pacientes.push(pacienteSeleccionado);
+            } else {
+                // Si es un paciente NO ASIGNADO y se lo traspasa a OTRO doctor (ej. Dra. Mendoza)
+                 pacienteSeleccionado.doctorId = doctorIdDestino;
+                 doctorDestino.pacientes.push(pacienteSeleccionado);
+            }
+            
+            // 3. Sincronizar en la DB principal (usuarios.paciente)
+            const indexDB = usuarios.paciente.findIndex(p => p.email === pacienteSeleccionado.email);
+            if(indexDB !== -1) {
+                usuarios.paciente[indexDB].doctorId = doctorIdDestino;
+                usuarios.paciente[indexDB].condicion = doctorDestino.nombre; // Actualizar condición en DB principal
+            }
+
+            alert(`Paciente ${pacienteSeleccionado.nombre} ${pacienteSeleccionadoOrigen === 'asignado' ? 'traspasado a' : 'asignado a'} ${doctorDestino.nombre}.`);
+            
+            closeTraspasoModal();
+            clearPacienteDetalle();
+            
+            // Recargar la pestaña actual del doctor
+            if (pacienteSeleccionadoOrigen === 'asignado') {
+                aplicarFiltros(); 
+            } else {
+                renderPacientesNoAsignados(pacientesNoAsignados);
+            }
+        }
+
+        function eliminarPacienteDeLista() {
+            if (!pacienteSeleccionado || pacienteSeleccionadoOrigen !== 'asignado') return;
+
+            if (confirm(`¿Está seguro de eliminar a ${pacienteSeleccionado.nombre} de su lista de pacientes?`)) {
+                
+                // 1. Eliminar de la lista del doctor actual
+                medicoActual.pacientes = medicoActual.pacientes.filter(p => p.email !== pacienteSeleccionado.email);
+                
+                // 2. Mover a la lista de no asignados y eliminar el doctorId
+                pacienteSeleccionado.doctorId = null;
+                pacienteSeleccionado.condicion = "Sin asignar";
+                // Verificar si ya existe en la lista de no asignados antes de añadir
+                if (!pacientesNoAsignados.some(p => p.email === pacienteSeleccionado.email)) {
+                    pacientesNoAsignados.push(pacienteSeleccionado);
+                }
+                
+                // 3. Sincronizar en la DB principal (usuarios.paciente)
+                const indexDB = usuarios.paciente.findIndex(p => p.email === pacienteSeleccionado.email);
+                if(indexDB !== -1) {
+                    usuarios.paciente[indexDB].doctorId = null;
+                    usuarios.paciente[indexDB].condicion = "Sin asignar";
+                }
+
+                alert(`Paciente ${pacienteSeleccionado.nombre} eliminado de su lista y movido a "No Asignados".`);
+                
+                clearPacienteDetalle();
+                aplicarFiltros();
+                // Si la pestaña de no asignados está visible, recargarla
+                if (document.getElementById('no-asignados').classList.contains('active')) {
+                     renderPacientesNoAsignados(pacientesNoAsignados);
+                }
+            }
+        }
+        
+        document.getElementById('formAgregarReceta').addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (!pacienteSeleccionado) return alert('Seleccione un paciente primero.');
+            const receta = document.getElementById('nuevaReceta').value.trim();
+            if (!receta) return;
+            const now = new Date();
+            
+            const nuevaRecetaObj = {
+                receta,
+                fecha: now.toLocaleDateString(),
+                hora: now.toLocaleTimeString(),
+                activo: true, 
+                indicaciones: 'Recetado por ' + medicoActual.nombre
+            };
+            
+            // 1. Agregar al historial del paciente seleccionado
+            pacienteSeleccionado.historialRecetas = pacienteSeleccionado.historialRecetas || [];
+            pacienteSeleccionado.historialRecetas.unshift(nuevaRecetaObj);
+            
+            document.getElementById('nuevaReceta').value = '';
+            document.getElementById('msgRecetaAgregada').style.display = 'block';
+            setTimeout(() => document.getElementById('msgRecetaAgregada').style.display = 'none', 1500);
+            
+            // Recargar detalles para mostrar la nueva receta
+            showPatientDetail(pacienteSeleccionado, pacienteSeleccionadoOrigen);
+        });
+
+        function mostrarHistorialRecetas(p) {
+            
+            const paciente = p || pacienteSeleccionado || pacienteLogueado;
+            if (!paciente) return;
+            
+            const historial = paciente.historialRecetas || [];
+
+            if (historial.length === 0) {
+                alert('No hay historial de medicamentos para este paciente.');
+                return;
+            }
+            
+            let html = `<h6>Historial de Recetas de ${paciente.nombre} ${paciente.apellidos}</h6><ul class="list-group">`;
+            historial.forEach(r => {
+                const estado = r.activo ? 'Activa' : 'Finalizada';
+                const estadoClass = r.activo ? 'badge bg-success' : 'badge bg-secondary';
+                html += `<li class="list-group-item" style="background-color:var(--color-futurista-secondary); color:var(--color-futurista-light); border-color:#556677;">
+                            <strong style="color:var(--color-futurista-accent);">${r.receta}</strong> <span class="${estadoClass}" style="background-color:${r.activo ? 'var(--color-futurista-success)' : '#556677'} !important;">${estado}</span>
+                            <br><small class="text-muted" style="color:#f0f8ff77 !important;">${r.indicaciones || 'Sin indicaciones.'} (Emitida: ${r.fecha} ${r.hora})</small>
+                        </li>`;
+            });
+            html += '</ul>';
+            
+            const modal = document.createElement('div');
+            modal.className = 'modal custom';
+            modal.style.display = 'block';
+            modal.innerHTML = `
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Historial de Medicación</h5>
+                            <button type="button" class="btn-close" aria-label="Cerrar" onclick="document.body.removeChild(this.closest('.modal'))"></button>
+                        </div>
+                        <div class="modal-body">${html}</div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" onclick="document.body.removeChild(this.closest('.modal'))">Cerrar</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+
+        // Función de logout
+        function logout() {
+            document.getElementById('presentacionInicio').style.display = 'block';
+            document.getElementById('mainContenido').style.display = 'block';
+            document.getElementById('piePagina').style.display = 'block';
+            document.getElementById('panel').style.display = 'none';
+            document.getElementById('medicoPanel').style.display = 'none';
+            document.getElementById('pacientePanel').style.display = 'none';
+            document.getElementById('loginForm').reset();
+            medicoActual = null;
+            pacienteLogueado = null; 
+            pacienteSeleccionado = null;
+            clearPacienteDetalle();
+        }
+        
+    </script>
+
+</body>
+</html>
