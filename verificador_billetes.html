@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Verificador de Billetes</title>
+
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+
+<style>
+
+body{
+margin:0;
+font-family:'Segoe UI',sans-serif;
+background:linear-gradient(135deg,#1e3c72,#2a5298);
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+color:white;
+}
+
+.card{
+background:white;
+color:#333;
+width:350px;
+border-radius:20px;
+padding:25px;
+box-shadow:0 10px 25px rgba(0,0,0,0.3);
+text-align:center;
+}
+
+h2{
+margin-bottom:15px;
+}
+
+select,input,button{
+width:100%;
+padding:12px;
+margin:10px 0;
+border-radius:10px;
+border:none;
+font-size:16px;
+}
+
+input{
+background:#f0f0f0;
+}
+
+button{
+background:#2a5298;
+color:white;
+cursor:pointer;
+transition:0.3s;
+}
+
+button:hover{
+background:#1e3c72;
+}
+
+.result{
+margin-top:15px;
+font-size:18px;
+font-weight:bold;
+}
+
+.valido{color:green;}
+.invalido{color:red;}
+
+video{
+width:100%;
+border-radius:10px;
+margin-top:10px;
+display:none;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="card">
+
+<h2>Verificador de Billetes</h2>
+
+<select id="denominacion">
+<option value="10">Bs 10</option>
+<option value="20">Bs 20</option>
+<option value="50">Bs 50</option>
+</select>
+
+<input type="number" id="serie" placeholder="Número de serie">
+
+<button onclick="verificar()">Verificar Manual</button>
+
+<button onclick="abrirCamara()">📷 Escanear Billete</button>
+
+<video id="video" autoplay></video>
+
+<div id="resultado" class="result"></div>
+
+<button onclick="resetear()">Volver a intentar</button>
+
+</div>
+
+<script>
+
+const rangos = {
+
+10:[
+{desde:77100001,hasta:77550000},
+{desde:78000001,hasta:78450000}
+],
+
+20:[
+{desde:87280145,hasta:91646549},
+{desde:96650001,hasta:97100000}
+],
+
+50:[
+{desde:67250001,hasta:67700000},
+{desde:69050001,hasta:69500000}
+]
+
+};
+
+let escaneoActivo=false;
+
+function verificar(){
+
+let serie=parseInt(document.getElementById("serie").value);
+let denom=document.getElementById("denominacion").value;
+let resultado=document.getElementById("resultado");
+
+let invalido=false;
+
+for(let r of rangos[denom]){
+
+if(serie>=r.desde && serie<=r.hasta){
+invalido=true;
+break;
+}
+
+}
+
+if(invalido){
+
+resultado.innerHTML="❌ Billete SIN valor legal";
+resultado.className="result invalido";
+
+}else{
+
+resultado.innerHTML="✅ Billete válido";
+resultado.className="result valido";
+
+}
+
+}
+
+async function abrirCamara(){
+
+const video=document.getElementById("video");
+
+video.style.display="block";
+
+const stream=await navigator.mediaDevices.getUserMedia({
+
+video:{
+facingMode:{exact:"environment"}
+}
+
+});
+
+video.srcObject=stream;
+
+escaneoActivo=true;
+
+iniciarEscaneo();
+
+}
+
+function iniciarEscaneo(){
+
+setInterval(()=>{
+
+if(escaneoActivo){
+capturarFrame();
+}
+
+},2000);
+
+}
+
+function capturarFrame(){
+
+const video=document.getElementById("video");
+
+if(video.videoWidth===0)return;
+
+const canvas=document.createElement("canvas");
+
+canvas.width=video.videoWidth;
+canvas.height=video.videoHeight;
+
+const ctx=canvas.getContext("2d");
+
+ctx.drawImage(video,0,0);
+
+Tesseract.recognize(
+canvas,
+'eng'
+).then(({data:{text}})=>{
+
+let numeros=text.replace(/\D/g,'');
+
+if(numeros.length>=7){
+
+document.getElementById("serie").value=numeros;
+
+verificar();
+
+}
+
+});
+
+}
+
+function resetear(){
+
+document.getElementById("serie").value="";
+document.getElementById("resultado").innerHTML="";
+document.getElementById("video").style.display="none";
+
+escaneoActivo=false;
+
+}
+
+</script>
+
+</body>
+</html>
