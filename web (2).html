@@ -1,0 +1,1704 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fundación Horizonte Democrático</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1a365d',
+                        primaryLight: '#2c5282',
+                        primaryDark: '#0f2744',
+                        accent: '#c9a227',
+                        accentLight: '#e6c65a',
+                        accentDark: '#9a7b1a',
+                        surface: '#fafaf9',
+                        surfaceAlt: '#f5f5f4',
+                        textPrimary: '#1c1917',
+                        textSecondary: '#57534e',
+                        textMuted: '#a8a29e',
+                        border: '#e7e5e4',
+                    },
+                    fontFamily: {
+                        display: ['Playfair Display', 'serif'],
+                        sans: ['DM Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --bg: #fafaf9;
+            --fg: #1c1917;
+            --muted: #57534e;
+            --accent: #c9a227;
+            --card: #ffffff;
+            --border: #e7e5e4;
+            --primary: #1a365d;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--fg);
+            overflow-x: hidden;
+        }
+
+        .page {
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .page.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Animaciones de entrada */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .animate-fade-up {
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        .animate-fade-left {
+            animation: fadeInLeft 0.8s ease forwards;
+        }
+
+        .animate-fade-right {
+            animation: fadeInRight 0.8s ease forwards;
+        }
+
+        .animate-scale {
+            animation: scaleIn 0.6s ease forwards;
+        }
+
+        .animate-float {
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-300 { animation-delay: 0.3s; }
+        .delay-400 { animation-delay: 0.4s; }
+        .delay-500 { animation-delay: 0.5s; }
+        .delay-600 { animation-delay: 0.6s; }
+
+        /* Scroll reveal */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Hero pattern */
+        .hero-pattern {
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(26, 54, 93, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(201, 162, 39, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 40% 80%, rgba(26, 54, 93, 0.02) 0%, transparent 40%);
+        }
+
+        /* Navbar */
+        .navbar {
+            backdrop-filter: blur(12px);
+            background: rgba(250, 250, 249, 0.9);
+            border-bottom: 1px solid rgba(231, 229, 228, 0.5);
+        }
+
+        .navbar.scrolled {
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Botones */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, #2c5282 100%);
+            color: white;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(26, 54, 93, 0.3);
+        }
+
+        .btn-accent {
+            background: linear-gradient(135deg, var(--accent) 0%, #e6c65a 100%);
+            color: var(--primary);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .btn-accent:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(201, 162, 39, 0.4);
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            transition: all 0.4s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.08);
+            border-color: transparent;
+        }
+
+        /* Form inputs */
+        .input-field {
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 14px 18px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(26, 54, 93, 0.1);
+        }
+
+        /* QR Container */
+        .qr-container {
+            background: linear-gradient(145deg, #ffffff 0%, #f8f8f7 100%);
+            border: 3px solid var(--accent);
+            position: relative;
+        }
+
+        .qr-container::before {
+            content: '';
+            position: absolute;
+            inset: -8px;
+            border: 1px dashed var(--accent);
+            border-radius: 20px;
+            opacity: 0.5;
+        }
+
+        /* Ranking */
+        .rank-item {
+            transition: all 0.3s ease;
+        }
+
+        .rank-item:hover {
+            background: linear-gradient(90deg, rgba(201, 162, 39, 0.05) 0%, transparent 100%);
+        }
+
+        .rank-badge {
+            background: linear-gradient(135deg, var(--accent) 0%, #e6c65a 100%);
+            color: var(--primary);
+        }
+
+        .rank-badge.silver {
+            background: linear-gradient(135deg, #9ca3af 0%, #d1d5db 100%);
+            color: #374151;
+        }
+
+        .rank-badge.bronze {
+            background: linear-gradient(135deg, #b45309 0%, #d97706 100%);
+            color: white;
+        }
+
+        /* Progress bar */
+        .progress-bar {
+            background: linear-gradient(90deg, var(--accent) 0%, var(--primary) 100%);
+            border-radius: 999px;
+            height: 8px;
+            transition: width 1s ease;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            background: rgba(26, 54, 93, 0.6);
+            backdrop-filter: blur(8px);
+        }
+
+        /* Seguir botón */
+        .follow-btn {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .follow-btn.following {
+            background: var(--primary);
+            color: white;
+        }
+
+        .follow-btn.following::after {
+            content: 'Siguiendo';
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--primary);
+            transition: all 0.3s ease;
+        }
+
+        .follow-btn.following:hover::after {
+            content: 'Dejar de seguir';
+            background: #dc2626;
+        }
+
+        /* Responsive menu */
+        .mobile-menu {
+            transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .mobile-menu.open {
+            transform: translateX(0);
+        }
+
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--muted);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar fixed top-0 left-0 right-0 z-50 px-4 lg:px-8 py-4">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <!-- Logo -->
+            <a href="#" onclick="navigateTo('home')" class="flex items-center gap-3 group">
+                <div class="w-12 h-12 rounded-xl bg-primary flex items-center justify-center group-hover:scale-105 transition-transform">
+                    <svg class="w-7 h-7 text-accent" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                    </svg>
+                </div>
+                <div class="hidden sm:block">
+                    <span class="font-display text-xl font-bold text-primary block leading-tight">Horizonte</span>
+                    <span class="text-xs text-textSecondary tracking-wider">DEMOCRÁTICO</span>
+                </div>
+            </a>
+
+            <!-- Desktop Menu -->
+            <div class="hidden lg:flex items-center gap-8">
+                <a href="#" onclick="navigateTo('home')" class="nav-link text-textSecondary hover:text-primary transition-colors font-medium">Inicio</a>
+                <a href="#" onclick="navigateTo('about')" class="nav-link text-textSecondary hover:text-primary transition-colors font-medium">Nosotros</a>
+                <a href="#" onclick="navigateTo('projects')" class="nav-link text-textSecondary hover:text-primary transition-colors font-medium">Proyectos</a>
+                <a href="#" onclick="navigateTo('donations')" class="nav-link text-textSecondary hover:text-primary transition-colors font-medium">Donaciones</a>
+                <a href="#" onclick="navigateTo('register')" class="nav-link text-textSecondary hover:text-primary transition-colors font-medium">Únete</a>
+            </div>
+
+            <!-- CTA Buttons -->
+            <div class="hidden lg:flex items-center gap-4">
+                <button onclick="openModal('login')" class="px-5 py-2.5 text-primary font-semibold hover:bg-primary/5 rounded-lg transition-colors">
+                    Ingresar
+                </button>
+                <button onclick="navigateTo('donations')" class="btn-accent px-6 py-2.5 rounded-lg font-semibold">
+                    Donar Ahora
+                </button>
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <button onclick="toggleMobileMenu()" class="lg:hidden p-2 rounded-lg hover:bg-primary/5 transition-colors" aria-label="Menú">
+                <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="mobile-menu fixed inset-0 z-50 bg-white">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-8">
+                <span class="font-display text-xl font-bold text-primary">Menú</span>
+                <button onclick="toggleMobileMenu()" class="p-2 rounded-lg hover:bg-primary/5 transition-colors" aria-label="Cerrar menú">
+                    <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <nav class="flex flex-col gap-4">
+                <a href="#" onclick="navigateTo('home'); toggleMobileMenu();" class="py-3 px-4 rounded-xl text-lg font-medium text-textSecondary hover:bg-primary/5 hover:text-primary transition-colors">Inicio</a>
+                <a href="#" onclick="navigateTo('about'); toggleMobileMenu();" class="py-3 px-4 rounded-xl text-lg font-medium text-textSecondary hover:bg-primary/5 hover:text-primary transition-colors">Nosotros</a>
+                <a href="#" onclick="navigateTo('projects'); toggleMobileMenu();" class="py-3 px-4 rounded-xl text-lg font-medium text-textSecondary hover:bg-primary/5 hover:text-primary transition-colors">Proyectos</a>
+                <a href="#" onclick="navigateTo('donations'); toggleMobileMenu();" class="py-3 px-4 rounded-xl text-lg font-medium text-textSecondary hover:bg-primary/5 hover:text-primary transition-colors">Donaciones</a>
+                <a href="#" onclick="navigateTo('register'); toggleMobileMenu();" class="py-3 px-4 rounded-xl text-lg font-medium text-textSecondary hover:bg-primary/5 hover:text-primary transition-colors">Únete</a>
+                <hr class="my-4 border-border">
+                <button onclick="openModal('login'); toggleMobileMenu();" class="py-3 px-4 rounded-xl text-lg font-medium text-primary bg-primary/5">Ingresar</button>
+                <button onclick="navigateTo('donations'); toggleMobileMenu();" class="btn-accent py-3 px-4 rounded-xl text-lg font-semibold text-center">Donar Ahora</button>
+            </nav>
+        </div>
+    </div>
+
+    <!-- ==================== HOME PAGE ==================== -->
+    <section id="page-home" class="page active">
+        <!-- Hero -->
+        <div class="hero-pattern min-h-screen pt-24 lg:pt-32 pb-16 px-4 lg:px-8">
+            <div class="max-w-7xl mx-auto">
+                <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+                    <!-- Hero Content -->
+                    <div class="animate-fade-up">
+                        <div class="inline-flex items-center gap-2 bg-accent/10 text-accentDark px-4 py-2 rounded-full mb-6">
+                            <span class="w-2 h-2 rounded-full bg-accent animate-pulse"></span>
+                            <span class="text-sm font-semibold">Construyendo democracia activa</span>
+                        </div>
+                        <h1 class="font-display text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-primary leading-tight mb-6">
+                            Un futuro más <span class="text-accent">justo</span> comienza hoy
+                        </h1>
+                        <p class="text-lg lg:text-xl text-textSecondary leading-relaxed mb-8 max-w-xl">
+                            Trabajamos por una sociedad donde cada voz cuenta. Promovemos la participación ciudadana, la transparencia y el desarrollo de políticas públicas que transforman vidas.
+                        </p>
+                        <div class="flex flex-wrap gap-4">
+                            <button onclick="navigateTo('donations')" class="btn-primary px-8 py-4 rounded-xl font-semibold text-lg">
+                                Contribuir Ahora
+                            </button>
+                            <button onclick="navigateTo('projects')" class="px-8 py-4 rounded-xl font-semibold text-lg border-2 border-primary text-primary hover:bg-primary hover:text-white transition-all">
+                                Ver Proyectos
+                            </button>
+                        </div>
+                        <!-- Stats -->
+                        <div class="grid grid-cols-3 gap-6 mt-12 pt-12 border-t border-border">
+                            <div>
+                                <span class="font-display text-3xl lg:text-4xl font-bold text-primary">15K+</span>
+                                <p class="text-textSecondary text-sm mt-1">Ciudadanos beneficiados</p>
+                            </div>
+                            <div>
+                                <span class="font-display text-3xl lg:text-4xl font-bold text-primary">47</span>
+                                <p class="text-textSecondary text-sm mt-1">Proyectos activos</p>
+                            </div>
+                            <div>
+                                <span class="font-display text-3xl lg:text-4xl font-bold text-primary">12</span>
+                                <p class="text-textSecondary text-sm mt-1">Años de trabajo</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Hero Image -->
+                    <div class="animate-fade-right delay-200">
+                        <div class="relative">
+                            <div class="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20 rounded-3xl transform rotate-3"></div>
+                            <div class="relative bg-white rounded-3xl overflow-hidden shadow-2xl">
+                                <img src="https://images.unsplash.com/photo-1555848962-6e79363ec58f?w=800&h=600&fit=crop" alt="Comunidad participando" class="w-full h-80 lg:h-96 object-cover">
+                                <div class="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent"></div>
+                                <div class="absolute bottom-0 left-0 right-0 p-6 text-white">
+                                    <p class="font-display text-xl font-semibold">Participación ciudadana en acción</p>
+                                    <p class="text-white/80 text-sm mt-1">La Plata, Bolivia - 2024</p>
+                                </div>
+                            </div>
+                            <!-- Floating Card -->
+                            <div class="absolute -bottom-6 -left-6 bg-white rounded-2xl shadow-xl p-4 animate-float hidden lg:block">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center">
+                                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold text-primary">Meta alcanzada</p>
+                                        <p class="text-sm text-textSecondary">+320 donantes este mes</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mission Section -->
+        <div class="py-20 lg:py-32 px-4 lg:px-8 bg-primary">
+            <div class="max-w-7xl mx-auto">
+                <div class="grid lg:grid-cols-2 gap-16 items-center">
+                    <div class="reveal">
+                        <span class="text-accent font-semibold tracking-wider uppercase text-sm">Nuestra Misión</span>
+                        <h2 class="font-display text-3xl lg:text-5xl font-bold text-white mt-4 mb-6">
+                            Fortalecer la democracia desde las bases
+                        </h2>
+                        <p class="text-white/80 text-lg leading-relaxed mb-8">
+                            La Fundación Horizonte Democrático trabaja incansablemente para empoderar a las comunidades, promover la transparencia institucional y formar líderes comprometidos con el bien común.
+                        </p>
+                        <div class="space-y-4">
+                            <div class="flex items-start gap-4">
+                                <div class="w-10 h-10 rounded-lg bg-accent/20 flex items-center justify-center flex-shrink-0 mt-1">
+                                    <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-white">Participación Ciudadana</h4>
+                                    <p class="text-white/70">Fomentamos espacios de diálogo y decisión comunitaria.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-4">
+                                <div class="w-10 h-10 rounded-lg bg-accent/20 flex items-center justify-center flex-shrink-0 mt-1">
+                                    <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-white">Transparencia Institucional</h4>
+                                    <p class="text-white/70">Promovemos rendición de cuentas y acceso a la información.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-4">
+                                <div class="w-10 h-10 rounded-lg bg-accent/20 flex items-center justify-center flex-shrink-0 mt-1">
+                                    <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-white">Formación de Líderes</h4>
+                                    <p class="text-white/70">Capacitamos a futuros representantes con valores democráticos.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="reveal delay-200">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-white/10 backdrop-blur rounded-2xl p-6 text-center">
+                                <span class="font-display text-4xl font-bold text-accent">98%</span>
+                                <p class="text-white/80 mt-2">de donaciones destinadas a proyectos</p>
+                            </div>
+                            <div class="bg-white/10 backdrop-blur rounded-2xl p-6 text-center mt-8">
+                                <span class="font-display text-4xl font-bold text-accent">5</span>
+                                <p class="text-white/80 mt-2">regiones de impacto nacional</p>
+                            </div>
+                            <div class="bg-white/10 backdrop-blur rounded-2xl p-6 text-center">
+                                <span class="font-display text-4xl font-bold text-accent">200+</span>
+                                <p class="text-white/80 mt-2">voluntarios activos</p>
+                            </div>
+                            <div class="bg-white/10 backdrop-blur rounded-2xl p-6 text-center mt-8">
+                                <span class="font-display text-4xl font-bold text-accent">4</span>
+                                <p class="text-white/80 mt-2">programas principales</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Featured Projects Preview -->
+        <div class="py-20 lg:py-32 px-4 lg:px-8">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center mb-16 reveal">
+                    <span class="text-accent font-semibold tracking-wider uppercase text-sm">Nuestro Trabajo</span>
+                    <h2 class="font-display text-3xl lg:text-5xl font-bold text-primary mt-4">Proyectos que transforman</h2>
+                </div>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Project Card 1 -->
+                    <div class="card overflow-hidden reveal">
+                        <div class="relative h-48">
+                            <img src="https://images.unsplash.com/photo-1509099836639-18ba1795216d?w=600&h=400&fit=crop" alt="Educación cívica" class="w-full h-full object-cover">
+                            <div class="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-sm font-medium text-primary">
+                                Educación
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="font-display text-xl font-bold text-primary mb-2">Escuelas de Ciudadanía</h3>
+                            <p class="text-textSecondary mb-4">Programa de formación en derechos y deberes cívicos para jóvenes de zonas rurales.</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-textMuted">1,200 participantes</span>
+                                <span class="text-accent font-semibold">Activo</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Project Card 2 -->
+                    <div class="card overflow-hidden reveal delay-100">
+                        <div class="relative h-48">
+                            <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600&h=400&fit=crop" alt="Mujeres líderes" class="w-full h-full object-cover">
+                            <div class="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-sm font-medium text-primary">
+                                Igualdad
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="font-display text-xl font-bold text-primary mb-2">Mujeres en Políticas</h3>
+                            <p class="text-textSecondary mb-4">Impulsamos la participación política de mujeres en gobiernos locales y nacionales.</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-textMuted">340 mujeres</span>
+                                <span class="text-accent font-semibold">Activo</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Project Card 3 -->
+                    <div class="card overflow-hidden reveal delay-200">
+                        <div class="relative h-48">
+                            <img src="https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?w=600&h=400&fit=crop" alt="Transparencia" class="w-full h-full object-cover">
+                            <div class="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-sm font-medium text-primary">
+                                Gobernanza
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="font-display text-xl font-bold text-primary mb-2">Observatorio Cívico</h3>
+                            <p class="text-textSecondary mb-4">Monitoreo y fiscalización de la gestión pública con participación ciudadana.</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-textMuted">89 reportes</span>
+                                <span class="text-accent font-semibold">Activo</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center mt-12 reveal">
+                    <button onclick="navigateTo('projects')" class="btn-primary px-8 py-4 rounded-xl font-semibold inline-flex items-center gap-2">
+                        Ver todos los proyectos
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- CTA Section -->
+        <div class="py-20 lg:py-32 px-4 lg:px-8 bg-gradient-to-br from-surface to-surfaceAlt">
+            <div class="max-w-4xl mx-auto text-center reveal">
+                <h2 class="font-display text-3xl lg:text-5xl font-bold text-primary mb-6">Tu voz importa, tu aporte transforma</h2>
+                <p class="text-lg text-textSecondary mb-10 max-w-2xl mx-auto">
+                    Cada contribución nos acerca a una sociedad más justa y participativa. Únete a los miles de ciudadanos que ya están construyendo el futuro.
+                </p>
+                <div class="flex flex-wrap justify-center gap-4">
+                    <button onclick="navigateTo('donations')" class="btn-accent px-8 py-4 rounded-xl font-semibold text-lg">
+                        Donar Ahora
+                    </button>
+                    <button onclick="navigateTo('register')" class="btn-primary px-8 py-4 rounded-xl font-semibold text-lg">
+                        Hacerme Socio
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== ABOUT PAGE ==================== -->
+    <section id="page-about" class="page">
+        <div class="pt-24 lg:pt-32 pb-16 px-4 lg:px-8">
+            <div class="max-w-7xl mx-auto">
+                <!-- Header -->
+                <div class="text-center mb-16 animate-fade-up">
+                    <span class="text-accent font-semibold tracking-wider uppercase text-sm">Conócenos</span>
+                    <h1 class="font-display text-4xl lg:text-6xl font-bold text-primary mt-4">Quiénes Somos</h1>
+                </div>
+
+                <!-- Story -->
+                <div class="grid lg:grid-cols-2 gap-16 items-center mb-24">
+                    <div class="animate-fade-left">
+                        <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&h=600&fit=crop" alt="Equipo de la fundación" class="rounded-3xl shadow-2xl w-full">
+                    </div>
+                    <div class="animate-fade-right">
+                        <h2 class="font-display text-3xl font-bold text-primary mb-6">Nuestra Historia</h2>
+                        <p class="text-textSecondary leading-relaxed mb-4">
+                            La Fundación Horizonte Democrático nació en 2012 de la mano de un grupo de ciudadanos comprometidos con el fortalecimiento de las instituciones democráticas en Bolivia.
+                        </p>
+                        <p class="text-textSecondary leading-relaxed mb-4">
+                            Desde entonces, hemos trabajado incansablemente para promover la participación ciudadana, la transparencia en la gestión pública y la formación de nuevos líderes con visión de país.
+                        </p>
+                        <p class="text-textSecondary leading-relaxed">
+                            Nuestra labor se extiende a cinco regiones del país, beneficiando a más de 15,000 ciudadanos a través de programas de educación cívica, empoderamiento político y vigilancia ciudadana.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Values -->
+                <div class="mb-24">
+                    <h2 class="font-display text-3xl font-bold text-primary text-center mb-12">Nuestros Valores</h2>
+                    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="card p-8 text-center">
+                            <div class="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                                <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064"/>
+                                </svg>
+                            </div>
+                            <h3 class="font-display text-xl font-bold text-primary mb-2">Democracia</h3>
+                            <p class="text-textSecondary text-sm">Promovemos la participación activa y el respeto a la voluntad popular.</p>
+                        </div>
+                        <div class="card p-8 text-center">
+                            <div class="w-16 h-16 rounded-2xl bg-accent/10 flex items-center justify-center mx-auto mb-4">
+                                <svg class="w-8 h-8 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                </svg>
+                            </div>
+                            <h3 class="font-display text-xl font-bold text-primary mb-2">Transparencia</h3>
+                            <p class="text-textSecondary text-sm">Rendimos cuentas y promovemos el acceso a la información pública.</p>
+                        </div>
+                        <div class="card p-8 text-center">
+                            <div class="w-16 h-16 rounded-2xl bg-green-100 flex items-center justify-center mx-auto mb-4">
+                                <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                </svg>
+                            </div>
+                            <h3 class="font-display text-xl font-bold text-primary mb-2">Solidaridad</h3>
+                            <p class="text-textSecondary text-sm">Trabajamos por los más vulnerables y la inclusión de todos.</p>
+                        </div>
+                        <div class="card p-8 text-center">
+                            <div class="w-16 h-16 rounded-2xl bg-blue-100 flex items-center justify-center mx-auto mb-4">
+                                <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
+                                </svg>
+                            </div>
+                            <h3 class="font-display text-xl font-bold text-primary mb-2">Excelencia</h3>
+                            <p class="text-textSecondary text-sm">Buscamos la calidad y el impacto en cada proyecto que emprendemos.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Team -->
+                <div>
+                    <h2 class="font-display text-3xl font-bold text-primary text-center mb-12">Equipo Directivo</h2>
+                    <div class="grid md:grid-cols-3 gap-8">
+                        <div class="card overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=400&fit=crop" alt="Director Ejecutivo" class="w-full h-64 object-cover">
+                            <div class="p-6 text-center">
+                                <h3 class="font-display text-xl font-bold text-primary">Carlos Mendoza</h3>
+                                <p class="text-accent font-medium">Director Ejecutivo</p>
+                                <p class="text-textSecondary text-sm mt-2">Experto en políticas públicas con 15 años de experiencia en desarrollo democrático.</p>
+                            </div>
+                        </div>
+                        <div class="card overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop" alt="Directora de Programas" class="w-full h-64 object-cover">
+                            <div class="p-6 text-center">
+                                <h3 class="font-display text-xl font-bold text-primary">María Elena Quispe</h3>
+                                <p class="text-accent font-medium">Directora de Programas</p>
+                                <p class="text-textSecondary text-sm mt-2">Especialista en participación ciudadana y desarrollo comunitario.</p>
+                            </div>
+                        </div>
+                        <div class="card overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop" alt="Director Financiero" class="w-full h-64 object-cover">
+                            <div class="p-6 text-center">
+                                <h3 class="font-display text-xl font-bold text-primary">Roberto Fernández</h3>
+                                <p class="text-accent font-medium">Director Financiero</p>
+                                <p class="text-textSecondary text-sm mt-2">CPA con experiencia en gestión de ONGs y transparencia financiera.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== PROJECTS PAGE ==================== -->
+    <section id="page-projects" class="page">
+        <div class="pt-24 lg:pt-32 pb-16 px-4 lg:px-8">
+            <div class="max-w-7xl mx-auto">
+                <!-- Header -->
+                <div class="text-center mb-16 animate-fade-up">
+                    <span class="text-accent font-semibold tracking-wider uppercase text-sm">Impacto Real</span>
+                    <h1 class="font-display text-4xl lg:text-6xl font-bold text-primary mt-4">Nuestros Proyectos</h1>
+                    <p class="text-lg text-textSecondary mt-4 max-w-2xl mx-auto">
+                        Conoce las iniciativas que están transformando comunidades en todo el país
+                    </p>
+                </div>
+
+                <!-- Filter Tabs -->
+                <div class="flex flex-wrap justify-center gap-3 mb-12 animate-fade-up delay-100">
+                    <button onclick="filterProjects('all')" class="project-filter active px-6 py-3 rounded-xl font-medium transition-all bg-primary text-white" data-filter="all">
+                        Todos
+                    </button>
+                    <button onclick="filterProjects('education')" class="project-filter px-6 py-3 rounded-xl font-medium transition-all bg-surfaceAlt text-textSecondary hover:bg-primary hover:text-white" data-filter="education">
+                        Educación
+                    </button>
+                    <button onclick="filterProjects('equality')" class="project-filter px-6 py-3 rounded-xl font-medium transition-all bg-surfaceAlt text-textSecondary hover:bg-primary hover:text-white" data-filter="equality">
+                        Igualdad
+                    </button>
+                    <button onclick="filterProjects('governance')" class="project-filter px-6 py-3 rounded-xl font-medium transition-all bg-surfaceAlt text-textSecondary hover:bg-primary hover:text-white" data-filter="governance">
+                        Gobernanza
+                    </button>
+                    <button onclick="filterProjects('development')" class="project-filter px-6 py-3 rounded-xl font-medium transition-all bg-surfaceAlt text-textSecondary hover:bg-primary hover:text-white" data-filter="development">
+                        Desarrollo
+                    </button>
+                </div>
+
+                <!-- Projects Grid -->
+                <div id="projectsGrid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Los proyectos se renderizan dinámicamente -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== DONATIONS PAGE ==================== -->
+    <section id="page-donations" class="page">
+        <div class="pt-24 lg:pt-32 pb-16 px-4 lg:px-8">
+            <div class="max-w-7xl mx-auto">
+                <!-- Header -->
+                <div class="text-center mb-16 animate-fade-up">
+                    <span class="text-accent font-semibold tracking-wider uppercase text-sm">Tu Aporte Cuenta</span>
+                    <h1 class="font-display text-4xl lg:text-6xl font-bold text-primary mt-4">Donaciones</h1>
+                    <p class="text-lg text-textSecondary mt-4 max-w-2xl mx-auto">
+                        Cada contribución nos acerca a una sociedad más justa y participativa
+                    </p>
+                </div>
+
+                <div class="grid lg:grid-cols-2 gap-12 items-start">
+                    <!-- QR & Donation Form -->
+                    <div class="animate-fade-left">
+                        <!-- Campaign Progress -->
+                        <div class="card p-8 mb-8">
+                            <h3 class="font-display text-xl font-bold text-primary mb-4">Campaña Anual 2024</h3>
+                            <div class="mb-4">
+                                <div class="flex justify-between text-sm mb-2">
+                                    <span class="text-textSecondary">Progreso</span>
+                                    <span class="font-semibold text-primary">Bs. 847,500 / Bs. 1,000,000</span>
+                                </div>
+                                <div class="h-4 bg-surfaceAlt rounded-full overflow-hidden">
+                                    <div class="progress-bar" style="width: 84.75%"></div>
+                                </div>
+                            </div>
+                            <p class="text-textSecondary text-sm">Faltan Bs. 152,500 para alcanzar nuestra meta</p>
+                        </div>
+
+                        <!-- QR Code -->
+                        <div class="card p-8 text-center">
+                            <h3 class="font-display text-2xl font-bold text-primary mb-2">Escanea para donar</h3>
+                            <p class="text-textSecondary mb-6">Usa tu aplicación bancaria favorita</p>
+                            <div class="qr-container rounded-2xl p-8 inline-block mb-6">
+                                <!-- QR Code simulado con SVG -->
+                                <svg class="w-48 h-48" viewBox="0 0 200 200" fill="none">
+                                    <rect width="200" height="200" fill="white"/>
+                                    <!-- QR Pattern simplificado -->
+                                    <g fill="#1a365d">
+                                        <!-- Esquinas -->
+                                        <rect x="10" y="10" width="50" height="50"/>
+                                        <rect x="140" y="10" width="50" height="50"/>
+                                        <rect x="10" y="140" width="50" height="50"/>
+                                        <!-- Centro blanco de esquinas -->
+                                        <rect x="20" y="20" width="30" height="30" fill="white"/>
+                                        <rect x="150" y="20" width="30" height="30" fill="white"/>
+                                        <rect x="20" y="150" width="30" height="30" fill="white"/>
+                                        <!-- Centro -->
+                                        <rect x="27" y="27" width="16" height="16"/>
+                                        <rect x="157" y="27" width="16" height="16"/>
+                                        <rect x="27" y="157" width="16" height="16"/>
+                                        <!-- Patrón central -->
+                                        <rect x="70" y="10" width="10" height="10"/>
+                                        <rect x="90" y="10" width="10" height="10"/>
+                                        <rect x="110" y="10" width="10" height="10"/>
+                                        <rect x="70" y="30" width="10" height="10"/>
+                                        <rect x="100" y="30" width="10" height="10"/>
+                                        <rect x="120" y="30" width="10" height="10"/>
+                                        <rect x="70" y="50" width="10" height="10"/>
+                                        <rect x="90" y="50" width="10" height="10"/>
+                                        <rect x="110" y="50" width="10" height="10"/>
+                                        <!-- Más patrón -->
+                                        <rect x="10" y="70" width="10" height="10"/>
+                                        <rect x="30" y="70" width="10" height="10"/>
+                                        <rect x="50" y="70" width="10" height="10"/>
+                                        <rect x="70" y="70" width="10" height="10"/>
+                                        <rect x="90" y="70" width="10" height="10"/>
+                                        <rect x="110" y="70" width="10" height="10"/>
+                                        <rect x="130" y="70" width="10" height="10"/>
+                                        <rect x="150" y="70" width="10" height="10"/>
+                                        <rect x="170" y="70" width="10" height="10"/>
+                                        <!-- Centro data -->
+                                        <rect x="80" y="80" width="40" height="40"/>
+                                        <rect x="90" y="90" width="20" height="20" fill="white"/>
+                                        <rect x="95" y="95" width="10" height="10"/>
+                                        <!-- Más patrón inferior -->
+                                        <rect x="10" y="90" width="10" height="10"/>
+                                        <rect x="30" y="90" width="10" height="10"/>
+                                        <rect x="50" y="90" width="10" height="10"/>
+                                        <rect x="130" y="90" width="10" height="10"/>
+                                        <rect x="150" y="90" width="10" height="10"/>
+                                        <rect x="170" y="90" width="10" height="10"/>
+                                        <rect x="10" y="110" width="10" height="10"/>
+                                        <rect x="30" y="110" width="10" height="10"/>
+                                        <rect x="50" y="110" width="10" height="10"/>
+                                        <rect x="130" y="110" width="10" height="10"/>
+                                        <rect x="150" y="110" width="10" height="10"/>
+                                        <rect x="170" y="110" width="10" height="10"/>
+                                        <!-- Patrón lado derecho -->
+                                        <rect x="70" y="130" width="10" height="10"/>
+                                        <rect x="90" y="130" width="10" height="10"/>
+                                        <rect x="110" y="130" width="10" height="10"/>
+                                        <rect x="70" y="150" width="10" height="10"/>
+                                        <rect x="100" y="150" width="10" height="10"/>
+                                        <rect x="120" y="150" width="10" height="10"/>
+                                        <rect x="70" y="170" width="10" height="10"/>
+                                        <rect x="90" y="170" width="10" height="10"/>
+                                        <rect x="110" y="170" width="10" height="10"/>
+                                        <rect x="140" y="140" width="50" height="50" fill="white"/>
+                                        <rect x="140" y="140" width="50" height="50"/>
+                                        <rect x="150" y="150" width="30" height="30" fill="white"/>
+                                        <rect x="157" y="157" width="16" height="16"/>
+                                    </g>
+                                </svg>
+                            </div>
+                            <p class="text-sm text-textMuted">Código QR - Fundación Horizonte Democrático</p>
+                        </div>
+
+                        <!-- Bank Info -->
+                        <div class="card p-6 mt-6">
+                            <h4 class="font-semibold text-primary mb-3">Datos bancarios</h4>
+                            <div class="space-y-2 text-sm">
+                                <p><span class="text-textMuted">Banco:</span> <span class="font-medium">Banco Nacional de Bolivia</span></p>
+                                <p><span class="text-textMuted">Cuenta:</span> <span class="font-medium">1023-4567-8901-2345</span></p>
+                                <p><span class="text-textMuted">Titular:</span> <span class="font-medium">Fundación Horizonte Democrático</span></p>
+                                <p><span class="text-textMuted">NIT:</span> <span class="font-medium">1023456789</span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ranking -->
+                    <div class="animate-fade-right">
+                        <div class="card overflow-hidden">
+                            <div class="bg-primary p-6">
+                                <h3 class="font-display text-2xl font-bold text-white">Ranking de Donantes</h3>
+                                <p class="text-white/70 mt-1">Top contribuyentes este mes</p>
+                            </div>
+                            <div class="p-6">
+                                <!-- Top 3 destacados -->
+                                <div class="grid grid-cols-3 gap-4 mb-8">
+                                    <!-- 2do lugar -->
+                                    <div class="text-center pt-8">
+                                        <div class="relative inline-block">
+                                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop" alt="2do lugar" class="w-16 h-16 rounded-full border-4 border-gray-300 object-cover mx-auto">
+                                            <div class="rank-badge silver absolute -bottom-2 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">2</div>
+                                        </div>
+                                        <p class="font-semibold text-primary text-sm mt-4 truncate">Miguel A.</p>
+                                        <p class="text-accent font-bold">Bs. 15,000</p>
+                                    </div>
+                                    <!-- 1er lugar -->
+                                    <div class="text-center">
+                                        <div class="relative inline-block">
+                                            <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop" alt="1er lugar" class="w-20 h-20 rounded-full border-4 border-accent object-cover mx-auto shadow-lg">
+                                            <div class="rank-badge absolute -bottom-2 left-1/2 -translate-x-1/2 w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold">1</div>
+                                        </div>
+                                        <p class="font-semibold text-primary text-sm mt-4 truncate">Ana María S.</p>
+                                        <p class="text-accent font-bold text-lg">Bs. 25,000</p>
+                                    </div>
+                                    <!-- 3er lugar -->
+                                    <div class="text-center pt-8">
+                                        <div class="relative inline-block">
+                                            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop" alt="3er lugar" class="w-16 h-16 rounded-full border-4 border-amber-700 object-cover mx-auto">
+                                            <div class="rank-badge bronze absolute -bottom-2 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">3</div>
+                                        </div>
+                                        <p class="font-semibold text-primary text-sm mt-4 truncate">Roberto F.</p>
+                                        <p class="text-accent font-bold">Bs. 12,500</p>
+                                    </div>
+                                </div>
+
+                                <!-- Lista completa -->
+                                <div id="rankingList" class="space-y-3">
+                                    <!-- Se renderiza dinámicamente -->
+                                </div>
+
+                                <button onclick="openModal('donationForm')" class="btn-accent w-full py-4 rounded-xl font-semibold mt-6">
+                                    Registrar mi donación
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== REGISTER PAGE ==================== -->
+    <section id="page-register" class="page">
+        <div class="pt-24 lg:pt-32 pb-16 px-4 lg:px-8 min-h-screen flex items-center">
+            <div class="max-w-6xl mx-auto w-full">
+                <div class="grid lg:grid-cols-2 gap-12 items-center">
+                    <!-- Form -->
+                    <div class="animate-fade-left">
+                        <div class="card p-8 lg:p-10">
+                            <h1 class="font-display text-3xl lg:text-4xl font-bold text-primary mb-2">Únete a nosotros</h1>
+                            <p class="text-textSecondary mb-8">Forma parte de la comunidad que está construyendo una democracia más fuerte.</p>
+
+                            <form id="registerForm" onsubmit="handleRegister(event)" class="space-y-5">
+                                <div class="grid sm:grid-cols-2 gap-5">
+                                    <div>
+                                        <label class="block text-sm font-medium text-textPrimary mb-2">Nombre</label>
+                                        <input type="text" name="firstName" required class="input-field" placeholder="Tu nombre">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-textPrimary mb-2">Apellido</label>
+                                        <input type="text" name="lastName" required class="input-field" placeholder="Tu apellido">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-textPrimary mb-2">Correo electrónico</label>
+                                    <input type="email" name="email" required class="input-field" placeholder="correo@ejemplo.com">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-textPrimary mb-2">Teléfono</label>
+                                    <input type="tel" name="phone" class="input-field" placeholder="+591 7XXXXXXX">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-textPrimary mb-2">Ciudad</label>
+                                    <select name="city" class="input-field">
+                                        <option value="">Selecciona tu ciudad</option>
+                                        <option value="lapaz">La Paz</option>
+                                        <option value="santacruz">Santa Cruz</option>
+                                        <option value="cochabamba">Cochabamba</option>
+                                        <option value="sucre">Sucre</option>
+                                        <option value="oruro">Oruro</option>
+                                        <option value="potosi">Potosí</option>
+                                        <option value="tarija">Tarija</option>
+                                        <option value="beni">Beni</option>
+                                        <option value="pando">Pando</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-textPrimary mb-2">Contraseña</label>
+                                    <input type="password" name="password" required class="input-field" placeholder="Mínimo 8 caracteres">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-textPrimary mb-2">Confirmar contraseña</label>
+                                    <input type="password" name="confirmPassword" required class="input-field" placeholder="Repite tu contraseña">
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <input type="checkbox" id="terms" name="terms" required class="mt-1 w-5 h-5 rounded border-border text-primary focus:ring-primary">
+                                    <label for="terms" class="text-sm text-textSecondary">
+                                        Acepto los <a href="#" class="text-primary font-medium hover:underline">términos y condiciones</a> y la <a href="#" class="text-primary font-medium hover:underline">política de privacidad</a>
+                                    </label>
+                                </div>
+                                <button type="submit" class="btn-primary w-full py-4 rounded-xl font-semibold text-lg">
+                                    Crear cuenta
+                                </button>
+                            </form>
+
+                            <p class="text-center text-textSecondary mt-6">
+                                ¿Ya tienes cuenta? <button onclick="openModal('login')" class="text-primary font-semibold hover:underline">Inicia sesión</button>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Benefits -->
+                    <div class="animate-fade-right hidden lg:block">
+                        <h2 class="font-display text-3xl font-bold text-primary mb-8">Beneficios de ser socio</h2>
+                        <div class="space-y-6">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center flex-shrink-0">
+                                    <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-primary">Participación en decisiones</h4>
+                                    <p class="text-textSecondary text-sm">Vota en asambleas y contribuye a definir las prioridades de la fundación.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center flex-shrink-0">
+                                    <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-primary">Eventos exclusivos</h4>
+                                    <p class="text-textSecondary text-sm">Acceso a foros, conferencias y encuentros con líderes de opinión.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center flex-shrink-0">
+                                    <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-primary">Información privilegiada</h4>
+                                    <p class="text-textSecondary text-sm">Recibe reportes mensuales sobre el impacto de nuestros proyectos.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center flex-shrink-0">
+                                    <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-primary">Comunidad activa</h4>
+                                    <p class="text-textSecondary text-sm">Conecta con otros ciudadanos comprometidos con el cambio.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Follow Section -->
+                        <div class="mt-10 p-6 bg-primary rounded-2xl">
+                            <h3 class="font-display text-xl font-bold text-white mb-4">Sigue nuestra página</h3>
+                            <p class="text-white/80 text-sm mb-4">Recibe actualizaciones sobre nuestros proyectos y eventos.</p>
+                            <button id="followBtn" onclick="toggleFollow()" class="follow-btn w-full py-3 rounded-xl font-semibold border-2 border-white text-white hover:bg-white hover:text-primary transition-all">
+                                Seguir
+                            </button>
+                            <div id="followCount" class="text-center text-white/70 text-sm mt-3">12,456 seguidores</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== MODALS ==================== -->
+    
+    <!-- Login Modal -->
+    <div id="loginModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+        <div class="modal-overlay absolute inset-0" onclick="closeModal('login')"></div>
+        <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 animate-scale">
+            <button onclick="closeModal('login')" class="absolute top-4 right-4 p-2 rounded-lg hover:bg-surfaceAlt transition-colors" aria-label="Cerrar">
+                <svg class="w-5 h-5 text-textMuted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+            <h2 class="font-display text-2xl font-bold text-primary mb-6">Iniciar Sesión</h2>
+            <form onsubmit="handleLogin(event)" class="space-y-5">
+                <div>
+                    <label class="block text-sm font-medium text-textPrimary mb-2">Correo electrónico</label>
+                    <input type="email" name="email" required class="input-field" placeholder="correo@ejemplo.com">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-textPrimary mb-2">Contraseña</label>
+                    <input type="password" name="password" required class="input-field" placeholder="Tu contraseña">
+                </div>
+                <div class="flex items-center justify-between">
+                    <label class="flex items-center gap-2">
+                        <input type="checkbox" name="remember" class="w-4 h-4 rounded border-border text-primary focus:ring-primary">
+                        <span class="text-sm text-textSecondary">Recordarme</span>
+                    </label>
+                    <a href="#" class="text-sm text-primary font-medium hover:underline">¿Olvidaste tu contraseña?</a>
+                </div>
+                <button type="submit" class="btn-primary w-full py-4 rounded-xl font-semibold">Ingresar</button>
+            </form>
+            <p class="text-center text-textSecondary mt-6">
+                ¿No tienes cuenta? <button onclick="closeModal('login'); navigateTo('register');" class="text-primary font-semibold hover:underline">Regístrate</button>
+            </p>
+        </div>
+    </div>
+
+    <!-- Donation Form Modal -->
+    <div id="donationFormModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+        <div class="modal-overlay absolute inset-0" onclick="closeModal('donationForm')"></div>
+        <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 animate-scale max-h-[90vh] overflow-y-auto">
+            <button onclick="closeModal('donationForm')" class="absolute top-4 right-4 p-2 rounded-lg hover:bg-surfaceAlt transition-colors" aria-label="Cerrar">
+                <svg class="w-5 h-5 text-textMuted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+            <h2 class="font-display text-2xl font-bold text-primary mb-6">Registrar Donación</h2>
+            <form onsubmit="handleDonation(event)" class="space-y-5">
+                <div>
+                    <label class="block text-sm font-medium text-textPrimary mb-2">Nombre completo</label>
+                    <input type="text" name="name" required class="input-field" placeholder="Tu nombre">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-textPrimary mb-2">Correo electrónico</label>
+                    <input type="email" name="email" required class="input-field" placeholder="correo@ejemplo.com">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-textPrimary mb-2">Monto (Bs.)</label>
+                    <input type="number" name="amount" required min="10" class="input-field" placeholder="Ej: 100">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-textPrimary mb-2">Mensaje (opcional)</label>
+                    <textarea name="message" rows="3" class="input-field" placeholder="Un mensaje de apoyo..."></textarea>
+                </div>
+                <div class="flex items-start gap-3">
+                    <input type="checkbox" id="anonymous" name="anonymous" class="mt-1 w-5 h-5 rounded border-border text-primary focus:ring-primary">
+                    <label for="anonymous" class="text-sm text-textSecondary">Quiero que mi donación sea anónima</label>
+                </div>
+                <button type="submit" class="btn-accent w-full py-4 rounded-xl font-semibold">Registrar donación</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Success Toast -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-green-600 text-white px-6 py-4 rounded-xl shadow-2xl transform translate-y-24 opacity-0 transition-all z-50">
+        <div class="flex items-center gap-3">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+            <span id="toastMessage">Operación exitosa</span>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-primary text-white py-16 px-4 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-12">
+                <div>
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center">
+                            <svg class="w-7 h-7 text-accent" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <span class="font-display text-xl font-bold block">Horizonte</span>
+                            <span class="text-xs text-white/60 tracking-wider">DEMOCRÁTICO</span>
+                        </div>
+                    </div>
+                    <p class="text-white/70 text-sm leading-relaxed">
+                        Construyendo una democracia más fuerte y participativa para todos los bolivianos.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-lg mb-4">Enlaces</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" onclick="navigateTo('home')" class="text-white/70 hover:text-accent transition-colors">Inicio</a></li>
+                        <li><a href="#" onclick="navigateTo('about')" class="text-white/70 hover:text-accent transition-colors">Nosotros</a></li>
+                        <li><a href="#" onclick="navigateTo('projects')" class="text-white/70 hover:text-accent transition-colors">Proyectos</a></li>
+                        <li><a href="#" onclick="navigateTo('donations')" class="text-white/70 hover:text-accent transition-colors">Donaciones</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-lg mb-4">Contacto</h4>
+                    <ul class="space-y-2 text-white/70 text-sm">
+                        <li>Av. 6 de Agosto #1234</li>
+                        <li>La Paz, Bolivia</li>
+                        <li>+591 2 2345678</li>
+                        <li>info@horizontedemocratico.org</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-lg mb-4">Síguenos</h4>
+                    <div class="flex gap-4">
+                        <a href="#" class="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center hover:bg-accent transition-colors" aria-label="Facebook">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center hover:bg-accent transition-colors" aria-label="Twitter">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center hover:bg-accent transition-colors" aria-label="Instagram">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                                <path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z" fill="none" stroke="currentColor" stroke-width="2"/>
+                                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center hover:bg-accent transition-colors" aria-label="YouTube">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M22.54 6.42a2.78 2.78 0 00-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 00-1.94 2A29 29 0 001 11.75a29 29 0 00.46 5.33A2.78 2.78 0 003.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 001.94-2 29 29 0 00.46-5.25 29 29 0 00-.46-5.33z"/>
+                                <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02" fill="white"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-white/10 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-white/50 text-sm">2024 Fundación Horizonte Democrático. Todos los derechos reservados.</p>
+                <div class="flex gap-6 text-sm">
+                    <a href="#" class="text-white/50 hover:text-accent transition-colors">Política de Privacidad</a>
+                    <a href="#" class="text-white/50 hover:text-accent transition-colors">Términos de Uso</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ==================== DATA (Simulating PostgreSQL) ====================
+        
+        // Database simulation - In production, these would come from PostgreSQL
+        const db = {
+            users: [
+                { id: 1, firstName: 'Carlos', lastName: 'Mendoza', email: 'carlos@ejemplo.com', city: 'lapaz' },
+                { id: 2, firstName: 'María', lastName: 'Quispe', email: 'maria@ejemplo.com', city: 'santacruz' },
+            ],
+            
+            donations: [
+                { id: 1, name: 'Ana María Soliz', email: 'ana@ejemplo.com', amount: 25000, message: 'Por un país mejor', anonymous: false, date: '2024-01-15' },
+                { id: 2, name: 'Miguel Ángel Pérez', email: 'miguel@ejemplo.com', amount: 15000, message: 'Sigamos construyendo', anonymous: false, date: '2024-01-14' },
+                { id: 3, name: 'Roberto Fernández', email: 'roberto@ejemplo.com', amount: 12500, message: '', anonymous: false, date: '2024-01-13' },
+                { id: 4, name: 'Carla Jiménez', email: 'carla@ejemplo.com', amount: 10000, message: 'Educación para todos', anonymous: false, date: '2024-01-12' },
+                { id: 5, name: 'Luis Martínez', email: 'luis@ejemplo.com', amount: 8500, message: '', anonymous: false, date: '2024-01-11' },
+                { id: 6, name: 'Patricia Sánchez', email: 'patricia@ejemplo.com', amount: 7500, message: 'Por la democracia', anonymous: false, date: '2024-01-10' },
+                { id: 7, name: 'Juan Carlos Ruiz', email: 'juan@ejemplo.com', amount: 6000, message: '', anonymous: false, date: '2024-01-09' },
+                { id: 8, name: 'Anónimo', email: '', amount: 5500, message: '', anonymous: true, date: '2024-01-08' },
+                { id: 9, name: 'Elena Vargas', email: 'elena@ejemplo.com', amount: 5000, message: 'Juntos somos más', anonymous: false, date: '2024-01-07' },
+                { id: 10, name: 'Fernando Loza', email: 'fernando@ejemplo.com', amount: 4500, message: '', anonymous: false, date: '2024-01-06' },
+            ],
+            
+            projects: [
+                { id: 1, title: 'Escuelas de Ciudadanía', description: 'Programa de formación en derechos y deberes cívicos para jóvenes de zonas rurales.', category: 'education', image: 'https://images.unsplash.com/photo-1509099836639-18ba1795216d?w=600&h=400&fit=crop', beneficiaries: '1,200', status: 'Activo' },
+                { id: 2, title: 'Mujeres en Políticas', description: 'Impulsamos la participación política de mujeres en gobiernos locales y nacionales.', category: 'equality', image: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600&h=400&fit=crop', beneficiaries: '340', status: 'Activo' },
+                { id: 3, title: 'Observatorio Cívico', description: 'Monitoreo y fiscalización de la gestión pública con participación ciudadana.', category: 'governance', image: 'https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?w=600&h=400&fit=crop', beneficiaries: '89', status: 'Activo' },
+                { id: 4, title: 'Jóvenes Líderes', description: 'Formación de nuevas generaciones de líderes comprometidos con el bien común.', category: 'education', image: 'https://images.unsplash.com/photo-1529390079861-591de354faf5?w=600&h=400&fit=crop', beneficiaries: '450', status: 'Activo' },
+                { id: 5, title: 'Comunidades Digitales', description: 'Conectividad y alfabetización digital para comunidades rurales.', category: 'development', image: 'https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=600&h=400&fit=crop', beneficiaries: '2,100', status: 'Activo' },
+                { id: 6, title: 'Transparencia Local', description: 'Implementación de mecanismos de rendición de cuentas en municipios.', category: 'governance', image: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=600&h=400&fit=crop', beneficiaries: '15', status: 'Activo' },
+                { id: 7, title: 'Derechos Indígenas', description: 'Fortalecimiento de la representación política de pueblos originarios.', category: 'equality', image: 'https://images.unsplash.com/photo-1516410529446-2c777cb7366d?w=600&h=400&fit=crop', beneficiaries: '890', status: 'Activo' },
+                { id: 8, title: 'Desarrollo Sostenible', description: 'Proyectos productivos con enfoque ambiental y comunitario.', category: 'development', image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=600&h=400&fit=crop', beneficiaries: '560', status: 'Activo' },
+                { id: 9, title: 'Foros Públicos', description: 'Espacios de debate sobre políticas públicas y temas de interés nacional.', category: 'governance', image: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=600&h=400&fit=crop', beneficiaries: '3,200', status: 'Activo' },
+            ],
+            
+            followers: 12456,
+            isFollowing: false
+        };
+
+        // ==================== NAVIGATION ====================
+        
+        let currentPage = 'home';
+
+        function navigateTo(page) {
+            // Hide current page
+            const currentPageEl = document.getElementById(`page-${currentPage}`);
+            if (currentPageEl) {
+                currentPageEl.classList.remove('active');
+            }
+
+            // Show new page
+            setTimeout(() => {
+                const newPageEl = document.getElementById(`page-${page}`);
+                if (newPageEl) {
+                    newPageEl.classList.add('active');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    
+                    // Re-trigger animations
+                    initScrollReveal();
+                }
+            }, 50);
+
+            currentPage = page;
+            
+            // Special initializations
+            if (page === 'donations') {
+                renderRanking();
+            }
+            if (page === 'projects') {
+                renderProjects('all');
+            }
+        }
+
+        // ==================== MOBILE MENU ====================
+        
+        let mobileMenuOpen = false;
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            mobileMenuOpen = !mobileMenuOpen;
+            if (mobileMenuOpen) {
+                menu.classList.add('open');
+                document.body.style.overflow = 'hidden';
+            } else {
+                menu.classList.remove('open');
+                document.body.style.overflow = '';
+            }
+        }
+
+        // ==================== MODALS ====================
+        
+        function openModal(modalName) {
+            const modal = document.getElementById(`${modalName}Modal`);
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeModal(modalName) {
+            const modal = document.getElementById(`${modalName}Modal`);
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                document.body.style.overflow = '';
+            }
+        }
+
+        // Close modals on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal('login');
+                closeModal('donationForm');
+            }
+        });
+
+        // ==================== TOAST NOTIFICATIONS ====================
+        
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            toastMessage.textContent = message;
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            
+            setTimeout(() => {
+                toast.classList.add('translate-y-24', 'opacity-0');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 3000);
+        }
+
+        // ==================== FORM HANDLERS ====================
+        
+        function handleRegister(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const password = formData.get('password');
+            const confirmPassword = formData.get('confirmPassword');
+            
+            if (password !== confirmPassword) {
+                alert('Las contraseñas no coinciden');
+                return;
+            }
+            
+            // Simulate database insert
+            const newUser = {
+                id: db.users.length + 1,
+                firstName: formData.get('firstName'),
+                lastName: formData.get('lastName'),
+                email: formData.get('email'),
+                city: formData.get('city')
+            };
+            
+            db.users.push(newUser);
+            
+            showToast('Cuenta creada exitosamente');
+            event.target.reset();
+            
+            setTimeout(() => {
+                openModal('login');
+            }, 1000);
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            
+            // Simulate login check
+            showToast('Sesión iniciada correctamente');
+            closeModal('login');
+            
+            // In production, this would validate against PostgreSQL
+        }
+
+        function handleDonation(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            
+            const newDonation = {
+                id: db.donations.length + 1,
+                name: formData.get('anonymous') === 'on' ? 'Anónimo' : formData.get('name'),
+                email: formData.get('email'),
+                amount: parseFloat(formData.get('amount')),
+                message: formData.get('message'),
+                anonymous: formData.get('anonymous') === 'on',
+                date: new Date().toISOString().split('T')[0]
+            };
+            
+            db.donations.push(newDonation);
+            db.donations.sort((a, b) => b.amount - a.amount);
+            
+            showToast('Donación registrada. Gracias por tu aporte.');
+            closeModal('donationForm');
+            event.target.reset();
+            renderRanking();
+        }
+
+        // ==================== FOLLOW BUTTON ====================
+        
+        function toggleFollow() {
+            const btn = document.getElementById('followBtn');
+            const countEl = document.getElementById('followCount');
+            
+            db.isFollowing = !db.isFollowing;
+            
+            if (db.isFollowing) {
+                db.followers++;
+                btn.classList.add('following');
+                btn.classList.remove('border-2', 'border-white', 'text-white');
+            } else {
+                db.followers--;
+                btn.classList.remove('following');
+                btn.classList.add('border-2', 'border-white', 'text-white');
+            }
+            
+            countEl.textContent = db.followers.toLocaleString() + ' seguidores';
+        }
+
+        // ==================== PROJECTS ====================
+        
+        function renderProjects(filter) {
+            const grid = document.getElementById('projectsGrid');
+            let filtered = db.projects;
+            
+            if (filter !== 'all') {
+                filtered = db.projects.filter(p => p.category === filter);
+            }
+            
+            grid.innerHTML = filtered.map((project, index) => `
+                <div class="card overflow-hidden reveal" style="animation-delay: ${index * 0.1}s">
+                    <div class="relative h-48">
+                        <img src="${project.image}" alt="${project.title}" class="w-full h-full object-cover">
+                        <div class="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-sm font-medium text-primary capitalize">
+                            ${getCategoryLabel(project.category)}
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-display text-xl font-bold text-primary mb-2">${project.title}</h3>
+                        <p class="text-textSecondary mb-4 text-sm">${project.description}</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-textMuted">${project.beneficiaries} beneficiados</span>
+                            <span class="text-accent font-semibold text-sm">${project.status}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            // Re-trigger reveal animations
+            setTimeout(initScrollReveal, 100);
+        }
+
+        function filterProjects(category) {
+            // Update button states
+            document.querySelectorAll('.project-filter').forEach(btn => {
+                btn.classList.remove('bg-primary', 'text-white');
+                btn.classList.add('bg-surfaceAlt', 'text-textSecondary');
+            });
+            
+            event.target.classList.remove('bg-surfaceAlt', 'text-textSecondary');
+            event.target.classList.add('bg-primary', 'text-white');
+            
+            renderProjects(category);
+        }
+
+        function getCategoryLabel(category) {
+            const labels = {
+                education: 'Educación',
+                equality: 'Igualdad',
+                governance: 'Gobernanza',
+                development: 'Desarrollo'
+            };
+            return labels[category] || category;
+        }
+
+        // ==================== RANKING ====================
+        
+        function renderRanking() {
+            const list = document.getElementById('rankingList');
+            const topDonations = db.donations.slice(3, 10);
+            
+            list.innerHTML = topDonations.map((donation, index) => `
+                <div class="rank-item flex items-center gap-4 p-3 rounded-xl">
+                    <div class="w-8 h-8 rounded-full bg-surfaceAlt flex items-center justify-center text-sm font-bold text-textMuted">
+                        ${index + 4}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="font-medium text-primary truncate">${donation.anonymous ? 'Anónimo' : donation.name}</p>
+                        <p class="text-xs text-textMuted">${donation.message || 'Sin mensaje'}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-bold text-accent">Bs. ${donation.amount.toLocaleString()}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ==================== SCROLL REVEAL ====================
+        
+        function initScrollReveal() {
+            const reveals = document.querySelectorAll('.reveal');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            });
+            
+            reveals.forEach(el => {
+                el.classList.remove('visible');
+                observer.observe(el);
+            });
+        }
+
+        // ==================== NAVBAR SCROLL ====================
+        
+        function initNavbarScroll() {
+            const navbar = document.querySelector('.navbar');
+            
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            });
+        }
+
+        // ==================== INITIALIZATION ====================
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            initScrollReveal();
+            initNavbarScroll();
+            renderRanking();
+            renderProjects('all');
+        });
+
+        // ==================== POSTGRESQL CONNECTION NOTES ====================
+        /*
+        Para conectar con PostgreSQL, necesitarás:
+
+        1. Backend Node.js con Express:
+        
+        const { Pool } = require('pg');
+        const pool = new Pool({
+            host: 'localhost',
+            port: 5432,
+            database: 'fundacion_horizonte',
+            user: 'tu_usuario',
+            password: 'tu_password'
+        });
+
+        // Ejemplo de endpoint para donaciones
+        app.get('/api/donations', async (req, res) => {
+            const result = await pool.query('SELECT * FROM donations ORDER BY amount DESC');
+            res.json(result.rows);
+        });
+
+        app.post('/api/donations', async (req, res) => {
+            const { name, email, amount, message, anonymous } = req.body;
+            const result = await pool.query(
+                'INSERT INTO donations (name, email, amount, message, anonymous) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+                [name, email, amount, message, anonymous]
+            );
+            res.json(result.rows[0]);
+        });
+
+        // Tabla de donaciones:
+        CREATE TABLE donations (
+            id SERIAL PRIMARY KEY,
+            name VARCHAR(255),
+            email VARCHAR(255),
+            amount DECIMAL(10, 2) NOT NULL,
+            message TEXT,
+            anonymous BOOLEAN DEFAULT false,
+            date DATE DEFAULT CURRENT_DATE
+        );
+
+        // Tabla de usuarios:
+        CREATE TABLE users (
+            id SERIAL PRIMARY KEY,
+            first_name VARCHAR(100) NOT NULL,
+            last_name VARCHAR(100) NOT NULL,
+            email VARCHAR(255) UNIQUE NOT NULL,
+            phone VARCHAR(20),
+            city VARCHAR(100),
+            password_hash VARCHAR(255) NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+
+        2. Reemplazar los datos en memoria (db object) con llamadas fetch a tu API.
+        3. Implementar autenticación JWT para el login.
+        */
+    </script>
+</body>
+</html>
